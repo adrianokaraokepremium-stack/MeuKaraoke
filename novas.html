@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adriano Karaokê - Músicas Novas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
+        body { background-color: #0B0A12; color: #FFFFFF; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; padding-bottom: 80px; }
+        
+        /* MODO CLARO - Sincronizado com o Catálogo */
+        body.modo-claro { background-color: #4A32A1 !important; }
+        body.modo-claro .app-container { background-color: #4A32A1 !important; }
+        body.modo-claro .btn-titulo, body.modo-claro .card-musica { background-color: #FFFFFF !important; color: #333333 !important; border: 1px solid #CCCCCC !important; }
+        body.modo-claro .txt-musica { color: #000000 !important; }
+        body.modo-claro .txt-label { color: #546E7A !important; }
+        body.modo-claro .txt-cantor { color: #007BFF !important; } 
+        body.modo-claro .txt-codigo { color: #D81B60 !important; }
+        body.modo-claro .menu-inferior { background-color: #4A32A1 !important; }
+
+        .app-container { width: 100%; max-width: 450px; display: flex; flex-direction: column; }
+        .banner-topo { width: 100%; height: auto; display: block; border-bottom: 3px solid #161426; }
+        
+        .btn-titulo { background: #161426; color: #FFFFFF; margin: 15px; padding: 15px; border-radius: 15px; display: flex; align-items: center; gap: 15px; font-weight: bold; font-size: 18px; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .lista-musicas { padding: 0 15px; display: flex; flex-direction: column; gap: 12px; }
+        .card-musica { background-color: #161426; border-radius: 14px; padding: 12px; display: flex; align-items: center; justify-content: space-between; border-left: 5px solid #5A94CB; }
+        
+        .avatar-artista { width: 55px; height: 55px; border-radius: 10px; cursor: pointer; object-fit: cover; }
+        .musica-detalhes { display: flex; flex-direction: column; gap: 2px; }
+        .txt-label { font-size: 13px; color: #8884A4; font-weight: 500; }
+        .txt-musica { font-size: 15px; color: #FFFFFF; font-weight: 700; } 
+        .txt-cantor { font-size: 15px; color: #5A94CB; font-weight: 700; } 
+        .txt-codigo { font-size: 15px; color: #FF4D4D; font-weight: 700; } 
+        
+        .musica-acoes { display: flex; gap: 25px; font-size: 20px; color: #FFFFFF; cursor: pointer; }
+        .icone-share { color: #5A94CB; } 
+        .icone-heart { color: #FF4D4D; }
+
+        .menu-inferior { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 450px; background-color: #161426; border-top: 2px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-around; align-items: center; height: 60px; z-index: 1000; }
+        .menu-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8884A4; text-decoration: none; font-size: 11px; font-weight: 600; cursor: pointer; }
+        .menu-item i { font-size: 20px !important; margin-bottom: 2px; display: block; }
+        .menu-item.ativo { color: #FFFFFF; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <img src="assets/banner_musicasnovas.jpg" alt="Músicas Novas" class="banner-topo">
+        
+        <div class="btn-titulo">
+            <i class="fa-solid fa-folder-open"></i> Músicas Novas
+        </div>
+        
+        <div class="lista-musicas">
+            <div class="card-musica">
+                <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                    <img src="assets/cantores/1kilo.jpg" class="avatar-artista" onclick="abrirMidia('Deixe Me Ir', '1 Kilo', '35045')">
+                    <div class="musica-detalhes">
+                        <div><span class="txt-label">Música:</span> <span class="txt-musica">Deixe Me Ir</span></div>
+                        <div><span class="txt-label">Artista:</span> <span class="txt-cantor">1 Kilo</span></div>
+                        <div><span class="txt-label">Código:</span> <span class="txt-codigo">35045</span></div>
+                    </div>
+                </div>
+                
+                <div class="musica-acoes">
+                    <i class="fa-solid fa-share-nodes icone-share" onclick="compartilharMusica('Deixe Me Ir', '35045')"></i>
+                    <i class="fa-regular fa-heart icone-heart" onclick="toggleFavorito(this)"></i>
+                </div>
+            </div>
+        </div>
+
+        <nav class="menu-inferior">
+            <a class="menu-item" href="catalogo.html"><i class="fa-solid fa-house"></i>Catálogo</a>
+            <a class="menu-item" href="favoritos.html"><i class="fa-solid fa-heart"></i>Favoritos</a>
+            <a class="menu-item" href="contato.html"><i class="fa-solid fa-comments"></i>Contato</a>
+            <a class="menu-item" href="ferramentas.html"><i class="fa-solid fa-gear"></i>Ferramentas</a>
+        </nav>
+    </div>
+    <script>
+        (function() {
+            if(localStorage.getItem('tema') === 'modo-claro') {
+                document.body.classList.add('modo-claro');
+            }
+        })();
+
+        function toggleFavorito(el) { el.classList.toggle('fa-solid'); el.classList.toggle('fa-regular'); }
+        function abrirMidia(m, c, cod) { window.location.href = `midia.html?musica=${m}&cantor=${c}&codigo=${cod}`; }
+        function compartilharMusica(m, c) { if (navigator.share) navigator.share({title: 'Karaokê', text: m}); }
+    </script>
+</body>
+</html>

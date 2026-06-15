@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adriano Karaokê - Mídia Integrada</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        body {
+            background-color: #000000; 
+            color: #FFFFFF;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 450px;
+            background-color: #000000;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            min-height: 100vh;
+            padding-bottom: 20px;
+        }
+
+        /* BARRA FIXA DE AÇÕES DO TOPO */
+        .header-acoes-topo {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 20px;
+            padding: 15px 20px;
+            font-size: 20px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 100;
+        }
+        .header-acoes-topo i.fa-heart { color: #FF4D4D; cursor: pointer; }
+        .header-acoes-topo i.fa-share-nodes { color: #5A94CB; cursor: pointer; }
+        .header-acoes-topo i.fa-xmark { color: #5A94CB; cursor: pointer; }
+
+        /* SELETOR DE SIMULAÇÃO (APENAS PARA TESTES NO PREVIEW) */
+        .debug-selector-container {
+            width: 100%;
+            padding: 55px 15px 5px 15px;
+            background-color: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            font-size: 11px;
+            border-bottom: 1px solid #222;
+        }
+        .debug-select {
+            background: #222;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            outline: none;
+        }
+
+        /* SEÇÕES FLUIDAS */
+        .view-section {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+        }
+        .view-section.ativa {
+            display: flex;
+        }
+
+        /* 1️⃣ TELA: LETRA E CIFRA DA MÚSICA */
+        .container-letra-view {
+            padding: 20px 20px 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .foto-cantor-letra {
+            width: 170px;
+            height: 170px;
+            object-fit: cover;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .titulo-musica-letra {
+            font-size: 24px;
+            color: #00E5FF; 
+            font-weight: 700;
+            margin-bottom: 8px;
+            padding: 0 10px;
+        }
+
+        .nome-autor-letra {
+            font-size: 19px;
+            color: #FFFFFF;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .codigo-letra {
+            font-size: 16px;
+            color: #FF4D4D;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        /* INFORMAÇÃO DA FONTE AUTOMÁTICA DE BUSCA */
+        .badge-fonte-busca {
+            font-size: 11px;
+            background-color: #161426;
+            color: #A08CD2;
+            padding: 4px 12px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(160, 140, 210, 0.2);
+            font-weight: 600;
+        }
+
+        /* TEXTO DA LETRA */
+        .bloco-texto-letra {
+            color: #FFFFFF;
+            font-weight: 500;
+            line-height: 1.8;
+            font-size: var(--tamanho-letra, 15px); 
+            width: 100%;
+            max-width: 360px;
+            overflow-x: auto;
+        }
+
+        .bloco-texto-letra.com-cifra {
+            text-align: left;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre;
+        }
+
+        .bloco-texto-letra.somante-letra {
+            text-align: center;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            white-space: pre-line;
+            line-height: 1.9;
+        }
+
+        .cifra-nota {
+            color: #00E5FF;
+            font-weight: bold;
+        }
+
+        /* 2️⃣ TELA: LISTA DO YOUTUBE */
+        .barra-topo-youtube {
+            background-color: #242235; 
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo-yt-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #FFFFFF;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .logo-yt-wrapper i { color: #FF0000; font-size: 24px; }
+
+        .txt-resultados-yt { font-size: 14px; color: #E2E0EC; }
+        .btn-voltar-yt { color: #4FB3FF; font-size: 22px; cursor: pointer; }
+
+        .feed-videos-youtube {
+            background-color: #1A1926;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: calc(100vh - 60px);
+            overflow-y: auto;
+        }
+
+        .card-video-yt { display: flex; gap: 12px; cursor: pointer; background: rgba(255,255,255,0.02); padding: 8px; border-radius: 8px; }
+        .card-video-yt:hover { background: rgba(255,255,255,0.08); }
+        .thumb-video { width: 130px; height: 80px; border-radius: 6px; object-fit: cover; }
+
+        .info-video-yt {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 3px;
+        }
+
+        .titulo-video-yt {
+            font-size: 13px;
+            color: #FFFFFF;
+            font-weight: 600;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .canal-video-yt { font-size: 11px; color: #8884A4; }
+        .views-video-yt { font-size: 11px; color: #8884A4; }
+
+        /* 3️⃣ TELA: REPRODUZIR VÍDEO */
+        .player-video-container {
+            width: 100%;
+            background-color: #242235;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-box-real {
+            width: 100%;
+            height: 230px;
+            background-color: #000;
+        }
+        .video-box-real iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .btn-fechar-video-player {
+            background-color: #242235;
+            color: #FFFFFF;
+            text-align: center;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-decoration: underline;
+        }
+
+        .letra-abaixo-do-video {
+            background-color: #242235;
+            padding: 30px 20px;
+            min-height: calc(100vh - 290px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto;
+        }
+
+        /* PAINEL DE AJUSTE DE FONTE */
+        .painel-ajuste-fonte-container {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 450px;
+            background-color: #000000; 
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 25px 35px 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 1000;
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.8);
+            transform: translate(-50%, 100%); 
+            transition: transform 0.3s ease-out;
+        }
+
+        .painel-ajuste-fonte-container.aberto {
+            transform: translate(-50%, 0); 
+        }
+
+        .titulo-painel-fonte {
+            text-align: center;
+            font-size: 15px;
+            color: #FFFFFF;
+            font-weight: 500;
+        }
+
+        .slider-fonte-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .slider-sinal { font-size: 24px; color: #FFFFFF; font-weight: 300; user-select: none; }
+
+        .input-range-fonte {
+            flex: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            outline: none;
+            border-radius: 2px;
+        }
+
+        .input-range-fonte::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #A08CD2; 
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(160, 140, 210, 0.8);
+        }
+
+        .botoes-painel-fonte-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .btn-painel-acao {
+            font-size: 15px;
+            color: #FFFFFF;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            padding: 5px 15px;
+        }
+        .divisor-vertical-painel { color: rgba(255, 255, 255, 0.3); font-size: 16px; font-weight: 300; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <div class="header-acoes-topo" id="header-global">
+            <i class="fa-solid fa-heart" onclick="alert('Favoritado!')"></i>
+            <i class="fa-solid fa-circle-play" onclick="mostrarAba('aba-youtube')"></i>
+            <span style="color:#FFF; font-weight:bold; font-size:16px; cursor:pointer; user-select:none;" onclick="abrirPainelFonte()">±A</span>
+            <i class="fa-solid fa-share-nodes" onclick="alert('Compartilhando!')"></i>
+            <i class="fa-solid fa-xmark" onclick="alert('Voltar ao catálogo principal')"></i>
+        </div>
+
+        <div class="debug-selector-container" id="debug-bar">
+            <span>Simular resposta da busca:</span>
+            <select class="debug-select" onchange="alternarModoBusca(this.value)">
+                <option value="cifraclub">Encontrado no Cifra Club (Com Cifras)</option>
+                <option value="cifrascombr">Encontrado no Cifras.com.br (Com Cifras)</option>
+                <option value="soletra">Não encontrado cifras (Apenas Letra Limpa)</option>
+            </select>
+        </div>
+
+        <div id="aba-letra" class="view-section ativa">
+            <div class="container-letra-view">
+                <img src="https://images.genius.com/f9c8ef7790b9b470f1a238612ca493da.1000x1000x1.jpg" alt="Artista" class="foto-cantor-letra">
+                <div class="titulo-musica-letra">Deixe-me Ir</div>
+                <div class="nome-autor-letra">Acústico 1Kilo</div>
+                <div class="codigo-letra">Código: 68383</div>
+                <div class="badge-fonte-busca" id="txt-fonte-atual">Fonte original: Cifra Club</div>
+                <div id="letra-conteudo-box" class="bloco-texto-letra com-cifra"></div>
+            </div>
+        </div>
+
+        <div id="aba-youtube" class="view-section">
+            <div class="barra-topo-youtube">
+                <div class="logo-yt-wrapper">
+                    <i class="fa-brands fa-youtube"></i> YouTube
+                </div>
+                <div class="txt-resultados-yt" id="contador-videos-texto">0 resultados encontrados</div>
+                <i class="fa-solid fa-rotate-left btn-voltar-yt" onclick="mostrarAba('aba-letra')"></i>
+            </div>
+            <div class="feed-videos-youtube" id="container-lista-youtube"></div>
+        </div>
+
+        <div id="aba-player-video" class="view-section">
+            <div class="player-video-container">
+                <div class="video-box-real">
+                    <iframe id="youtube-player-iframe" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                </div>
+                <div class="btn-fechar-video-player" onclick="fecharVideoPlayer()">
+                    ✕ Fechar Vídeo
+                </div>
+                <div class="letra-abaixo-do-video" id="letra-player-box"></div>
+            </div>
+        </div>
+
+        <div class="painel-ajuste-fonte-container" id="painel-fonte">
+            <div class="titulo-painel-fonte">Ajuste o tamanho da letra</div>
+            <div class="slider-fonte-row">
+                <span class="slider-sinal">&#8722;</span> 
+                <input type="range" id="range-fonte" class="input-range-fonte" min="12" max="24" value="15" oninput="atualizarTamanhoSlider(this.value)">
+                <span class="slider-sinal">&#43;</span> 
+            </div>
+            <div class="botoes-painel-fonte-row">
+                <button class="btn-painel-acao" onclick="restaurarFontePadrao()">Restaurar</button>
+                <span class="divisor-vertical-painel">|</span>
+                <button class="btn-painel-acao" onclick="fecharPainelFonte()">Confirmar</button>
+            </div>
+        </div>
+
+    </div>
+    <script>
+        let tamanhoSalvo = 15;
+
+        // BANCO DE DADOS ATUALIZADO COM VÍDEOS LIBERADOS PARA TOCAR EM LOCALHOST
+        const listaVideosBuscados = [
+            {
+                id: 1,
+                titulo: "Acústico 1Kilo - Deixe-me Ir (Baviera, Knust e Pablo Martins)",
+                canal: "1Kilo Oficial",
+                views: "802.0M visualizações",
+                thumb: "https://images.genius.com/f9c8ef7790b9b470f1a238612ca493da.1000x1000x1.jpg",
+                embedUrl: "https://www.youtube.com/embed/jZ_orL96HwE?autoplay=1", // Link alternativo liberado
+                temLetra: true,
+                classeLetra: "com-cifra",
+                letraCorpo: `<span class="cifra-nota">C</span>                <span class="cifra-nota">G</span>\nLook into my eyes - you will see\n<span class="cifra-nota">Am</span>              <span class="cifra-nota">F</span>\nWhat you mean to me\n<span class="cifra-nota">C</span>                 <span class="cifra-nota">G</span>\nSearch your heart - search your soul`
+            },
+            {
+                id: 2,
+                titulo: "Acústico 1Kilo - Deixe me Ir LETRA YouTube",
+                canal: "carol alves",
+                views: "635.5K visualizações",
+                thumb: "https://images.genius.com/f9c8ef7790b9b470f1a238612ca493da.1000x1000x1.jpg",
+                embedUrl: "https://www.youtube.com/embed/jZ_orL96HwE?autoplay=1",
+                temLetra: true,
+                classeLetra: "somante-letra",
+                letraCorpo: "Look into my eyes - you will see\nWhat you mean to me\nSearch your heart - search your soul\nEverything I Do - I do it for you"
+            },
+            {
+                id: 3,
+                titulo: "1Kilo - Deixe-me ir (Letra)",
+                canal: "Letras e Vídeos",
+                views: "1.2M visualizações",
+                thumb: "https://images.genius.com/f9c8ef7790b9b470f1a238612ca493da.1000x1000x1.jpg",
+                embedUrl: "https://www.youtube.com/embed/jZ_orL96HwE?autoplay=1",
+                temLetra: false
+            },
+            {
+                id: 4,
+                titulo: "Acústico 1Kilo - Deixe-me Ir (Baviera, Knust e Pablo Martins) [Áudio Oficial]",
+                canal: "Só Música",
+                views: "106.1K visualizações",
+                thumb: "https://images.genius.com/f9c8ef7790b9b470f1a238612ca493da.1000x1000x1.jpg",
+                embedUrl: "https://www.youtube.com/embed/jZ_orL96HwE?autoplay=1",
+                temLetra: true,
+                classeLetra: "com-cifra",
+                letraCorpo: `<span class="cifra-nota">C7M</span>              <span class="cifra-nota">G7</span>\nLook into my eyes - you will see\n<span class="cifra-nota">Am9</span>             <span class="cifra-nota">F7M</span>\nWhat you mean to me`
+            },
+            {
+                id: 5,
+                titulo: "1Kilo - Deixe-Me Ir (LIVA Remix)",
+                canal: "O Problema É GRAVE",
+                views: "2.5M visualizações",
+                thumb: "https://images.genius.com/f9c8ef7790b9b470f1a238612ca493da.1000x1000x1.jpg",
+                embedUrl: "https://www.youtube.com/embed/L8bV_z9r9lM/mqdefault.jpg",
+                temLetra: false
+            }
+        ];
+
+        const modelsTexto = {
+            cifraclub: {
+                badge: "Fonte: Cifra Club (Principal)",
+                classe: "com-cifra",
+                texto: `<span class="cifra-nota">C</span>                <span class="cifra-nota">G</span>\nLook into my eyes - you will see\n<span class="cifra-nota">Am</span>              <span class="cifra-nota">F</span>\nWhat you mean to me\n<span class="cifra-nota">C</span>                 <span class="cifra-nota">G</span>\nSearch your heart - search your soul`
+            },
+            cifrascombr: {
+                badge: "Fonte: Cifras.com.br (Reserva 1)",
+                classe: "com-cifra",
+                texto: `<span class="cifra-nota">C7M</span>              <span class="cifra-nota">G7</span>\nLook into my eyes - you will see\n<span class="cifra-nota">Am9</span>             <span class="cifra-nota">F7M</span>\nWhat you mean to me`
+            },
+            soletra: {
+                badge: "Cifras indisponíveis. Carregando apenas a letra.",
+                classe: "somante-letra",
+                texto: `Look into my eyes - you will see\nWhat you mean to me\nSearch your heart - search your soul\nAnd when you find me there you'll search no more\n\nDon't tell me it's not worth tryin' for\nEverything I Do - I do it for you`
+            }
+        };
+
+        function inicializarLetra() {
+            alternarModoBusca('cifraclub');
+            renderizarListaVideos();
+        }
+
+        function alternarModoBusca(chave) {
+            const dados = modelsTexto[chave];
+            const box = document.getElementById('letra-conteudo-box');
+            if(!box) return;
+            
+            document.getElementById('txt-fonte-atual').innerText = dados.badge;
+            box.className = "bloco-texto-letra " + dados.classe;
+            box.innerHTML = dados.texto;
+        }
+
+        function renderizarListaVideos() {
+            const container = document.getElementById('container-lista-youtube');
+            const contadorTexto = document.getElementById('contador-videos-texto');
+            if(!container || !contadorTexto) return;
+            
+            contadorTexto.innerText = `${listaVideosBuscados.length} resultados encontrados`;
+            container.innerHTML = "";
+            
+            listaVideosBuscados.forEach(video => {
+                const cardHtml = `
+                    <div class="card-video-yt" onclick="reproduzirVideoSelecionado(${video.id})">
+                        <img src="${video.thumb}" class="thumb-video" alt="Capa">
+                        <div class="info-video-yt">
+                            <div class="titulo-video-yt">${video.titulo}</div>
+                            <div class="canal-video-yt">${video.canal}</div>
+                            <div class="views-video-yt">${video.views}</div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        }
+
+        function reproduzirVideoSelecionado(idVideo) {
+            const videoObj = listaVideosBuscados.find(v => v.id === idVideo);
+            if (!videoObj) return;
+
+            document.getElementById('youtube-player-iframe').src = videoObj.embedUrl;
+
+            const letraBox = document.getElementById('letra-player-box');
+            if (videoObj.temLetra) {
+                letraBox.innerHTML = `
+                    <div class="bloco-texto-letra ${videoObj.classeLetra}">
+                        ${videoObj.letraCorpo}
+                    </div>
+                `;
+            } else {
+                letraBox.innerHTML = `
+                    <div class="bloco-texto-letra" style="text-align: center; font-family: inherit;">
+                        'Não encontramos nenhuma letra para essa música 😢'
+                    </div>
+                `;
+            }
+
+            mostrarAba('aba-player-video');
+        }
+
+        function fecharVideoPlayer() {
+            document.getElementById('youtube-player-iframe').src = "";
+            mostrarAba('aba-youtube');
+        }
+
+        function mostrarAba(idAba) {
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('ativa'));
+            
+            const abaAlvo = document.getElementById(idAba);
+            if(abaAlvo) abaAlvo.classList.add('ativa');
+            
+            const header = document.getElementById('header-global');
+            const debugBar = document.getElementById('debug-bar');
+            
+            if(idAba === 'aba-letra') {
+                if(header) header.style.display = 'flex';
+                if(debugBar) debugBar.style.display = 'flex';
+            } else {
+                if(header) header.style.display = 'none';
+                if(debugBar) debugBar.style.display = 'none';
+                fecharPainelFonte();
+            }
+        }
+
+        function abrirPainelFonte() { document.getElementById('painel-fonte').classList.add('aberto'); }
+        function fecharPainelFonte() { document.getElementById('painel-fonte').classList.remove('aberto'); }
+        function atualizarTamanhoSlider(valor) { document.documentElement.style.setProperty('--tamanho-letra', valor + 'px'); }
+        function restaurarFontePadrao() { document.getElementById('range-fonte').value = 15; atualizarTamanhoSlider(15); }
+
+        inicializarLetra();
+    </script>
+</body>
+</html>

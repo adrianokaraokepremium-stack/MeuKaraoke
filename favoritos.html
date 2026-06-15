@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adriano Karaokê - Favoritos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
+        body { background-color: #0B0A12; color: #FFFFFF; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; overflow-x: hidden; padding-bottom: 90px; }
+        
+        /* MODO CLARO */
+        body.modo-claro { background-color: #4A32A1 !important; }
+        body.modo-claro .app-container { background-color: #4A32A1 !important; }
+        body.modo-claro .card-contador, body.modo-claro .card-musica, body.modo-claro .input-pesquisa, body.modo-claro .btn-novas { background-color: #FFFFFF !important; border: 1px solid #CCCCCC !important; color: #333333 !important; }
+        body.modo-claro .txt-musica { color: #000000 !important; }
+        body.modo-claro .txt-label { color: #546E7A !important; }
+        body.modo-claro .txt-cantor { color: #007BFF !important; } 
+        body.modo-claro .txt-codigo { color: #D81B60 !important; }
+        body.modo-claro .menu-inferior { background-color: #4A32A1 !important; }
+        body.modo-claro .slider { background-color: #FFFFFF !important; border: 1px solid #333 !important; }
+        body.modo-claro .slider:before { background-color: #4A32A1 !important; }
+        body.modo-claro .contador-numero, body.modo-claro .contador-info { color: #333333 !important; }
+        
+        .fa-microphone { color: #FFFFFF !important; cursor: pointer; }
+        body.modo-claro .fa-microphone { color: #000000 !important; }
+
+        .app-container { width: 100%; max-width: 450px; background-color: #0B0A12; display: flex; flex-direction: column; }
+        .banner-topo { width: 100%; height: auto; display: block; border-bottom: 3px solid #161426; }
+        .contadores-container { display: flex; gap: 12px; padding: 15px; width: 100%; }
+        
+        .card-contador { flex: 1; background-color: #161426; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255, 255, 255, 0.05); min-height: 48px; }
+        .contador-info { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #FFFFFF; }
+        .contador-numero { font-size: 16px; font-weight: bold; color: #FFFFFF; }
+
+        .filtros-row { display: flex; justify-content: center; align-items: center; padding: 0 15px 15px 15px; }
+        .btn-novas { background-color: #161426; border: 1px solid #FFFFFF; color: #FFFFFF; padding: 8px 20px; border-radius: 20px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .pesquisa-container { padding: 0 15px 15px 15px; position: relative; }
+        .pesquisa-wrapper { position: relative; display: flex; align-items: center; }
+        .input-pesquisa { width: 100%; background-color: #161426; border: 2px solid transparent; color: #FFFFFF; padding: 12px 45px; border-radius: 25px; font-size: 15px; outline: none; }
+        
+        .lista-musicas { padding: 0 15px; display: flex; flex-direction: column; gap: 12px; }
+        .card-musica { background-color: #161426; border-radius: 14px; padding: 12px; display: flex; align-items: center; justify-content: space-between; border-left: 5px solid #5A94CB; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); }
+        .avatar-artista { width: 55px; height: 55px; border-radius: 10px; cursor: pointer; }
+        .txt-label { font-size: 13px; color: #8884A4; font-weight: 500; }
+        .txt-musica { font-size: 15px; color: #FFFFFF; font-weight: 700; } 
+        .txt-cantor { font-size: 15px; color: #5A94CB; font-weight: 700; } 
+        .txt-codigo { font-size: 15px; color: #FF4D4D; font-weight: 700; } 
+        
+        /* CORREÇÃO DO CLIQUE */
+        .musica-acoes { display: flex; gap: 30px; font-size: 22px; color: #FFFFFF; cursor: pointer; position: relative; z-index: 10; padding: 10px; }
+        .icone-share, .icone-heart { cursor: pointer; pointer-events: auto; }
+        .icone-share { color: #5A94CB; }
+        
+        /* RODAPÉ E ÍCONES PADRONIZADOS */
+        .menu-inferior { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 450px; background-color: #161426; border-top: 2px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
+        .menu-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8884A4; text-decoration: none; font-size: 11px; font-weight: 600; cursor: pointer; flex: 1; }
+        .menu-item i { font-size: 20px !important; margin-bottom: 4px; display: block; }
+        .menu-item.ativo { color: #FFFFFF; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Banner ajustado com o nome correto -->
+        <img src="assets/banner_favoritos.jpg" alt="Favoritos" class="banner-topo">
+
+        <div class="contadores-container">
+            <div class="card-contador">
+                <div class="contador-info"><i class="fa-solid fa-heart" style="color: #FF4D4D;"></i> Favoritas</div>
+                <div class="contador-numero" id="num-favoritas">0</div>
+            </div>
+            <div class="card-contador">
+                <div class="contador-info"><i class="fa-solid fa-music"></i> Total de Músicas</div>
+                <div class="contador-numero" id="num-total">1250</div>
+            </div>
+        </div>
+
+        <div class="filtros-row">
+            <button class="btn-novas" onclick="window.location.href='novas.html'">
+                <i class="fa-solid fa-folder-plus"></i> MÚSICAS NOVAS
+            </button>
+        </div>
+
+        <div class="pesquisa-container">
+            <div class="pesquisa-wrapper">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 15px; color: #8884A4;"></i>
+                <input type="text" id="campo-busca" class="input-pesquisa" placeholder="Pesquisar favoritos..." onkeyup="filtrarFavoritos()">
+                <i class="fa-solid fa-microphone" onclick="iniciarBuscaVoz()" style="position: absolute; right: 15px; cursor: pointer;"></i>
+            </div>
+        </div>
+
+        <div class="lista-musicas" id="lista-container">
+            <div class="card-musica">
+                <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                    <img src="assets/cantores/1kilo.jpg" class="avatar-artista" onclick="abrirMidia('Deixe Me Ir', '1 Kilo', '35045')">
+                    <div class="musica-detalhes">
+                        <div><span class="txt-label">Música:</span> <span class="txt-musica">Deixe Me Ir</span></div>
+                        <div><span class="txt-label">Artista:</span> <span class="txt-cantor">1 Kilo</span></div>
+                        <div><span class="txt-label">Código:</span> <span class="txt-codigo">35045</span></div>
+                    </div>
+                </div>
+                <div class="musica-acoes">
+                    <i class="fa-solid fa-share-nodes icone-share" onclick="compartilharMusica('Deixe Me Ir', '35045')"></i>
+                    <i class="fa-solid fa-heart" style="color: #FF4D4D;" onclick="removerDosFavoritos(this)"></i>
+                </div>
+            </div>
+        </div>
+
+        <nav class="menu-inferior">
+            <a class="menu-item" href="catalogo.html"><i class="fa-solid fa-house"></i>Catálogo</a>
+            <a class="menu-item ativo" href="favoritos.html"><i class="fa-solid fa-heart"></i>Favoritos</a>
+            <a class="menu-item" href="contato.html"><i class="fa-solid fa-comments"></i>Contato</a>
+            <a class="menu-item" href="ferramentas.html"><i class="fa-solid fa-gear"></i>Ferramentas</a>
+        </nav>
+    </div>
+
+    <script>
+        window.onload = function() { 
+            if(localStorage.getItem('tema') === 'modo-claro') document.body.classList.add('modo-claro'); 
+            atualizarContador();
+        };
+
+        function atualizarContador() {
+            const cards = document.querySelectorAll('.card-musica');
+            let visiveis = 0;
+            cards.forEach(card => { if (card.style.display !== 'none') visiveis++; });
+            document.getElementById('num-favoritas').innerText = visiveis;
+        }
+
+        function compartilharMusica(musica, codigo) { 
+            if (navigator.share) navigator.share({ title: 'Adriano Karaokê', text: `Confira a música ${musica} (Código: ${codigo})!`, url: window.location.href }); 
+        }
+
+        function iniciarBuscaVoz() {
+            const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            rec.lang = 'pt-BR';
+            rec.onresult = (e) => { document.getElementById('campo-busca').value = e.results[0][0].transcript; filtrarFavoritos(); };
+            rec.start();
+        }
+
+        function abrirMidia(m, c, cod) { window.location.href = `midia.html?musica=${m}&cantor=${c}&codigo=${cod}`; }
+
+        function removerDosFavoritos(elemento) {
+            if(confirm("Deseja remover esta música dos seus favoritos?")) {
+                let card = elemento.closest('.card-musica');
+                card.style.display = 'none';
+                atualizarContador();
+            }
+        }
+        function filtrarFavoritos() {
+            let input = document.getElementById('campo-busca').value.toLowerCase();
+            let cards = document.getElementsByClassName('card-musica');
+            for (let card of cards) {
+                card.style.display = card.innerText.toLowerCase().includes(input) ? "flex" : "none";
+            }
+            atualizarContador();
+        }
+    </script>
+</body>
+</html>

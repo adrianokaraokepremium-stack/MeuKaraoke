@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adriano Karaokê - Contato e Redes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
+        
+        body { background-color: #0B0A12; color: #FFFFFF; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; padding-bottom: 90px; }
+        
+        /* MODO CLARO - FORÇADO COM !IMPORTANT */
+        body.modo-claro { background-color: #4A32A1 !important; }
+        body.modo-claro .app-container { background-color: #4A32A1 !important; }
+        body.modo-claro .btn-rede-social { background-color: #FFFFFF !important; color: #333333 !important; border: 1px solid #CCCCCC !important; }
+        body.modo-claro .titulo-contato { color: #FFFFFF !important; }
+        body.modo-claro .menu-inferior { background-color: #4A32A1 !important; }
+
+        .app-container { width: 100%; max-width: 450px; display: flex; flex-direction: column; min-height: 100vh; }
+        .banner-topo { width: 100%; height: auto; display: block; border-bottom: 3px solid #161426; }
+        .titulo-contato { text-align: center; font-size: 22px; font-weight: 700; color: #5A94CB; margin: 30px 0 20px 0; }
+        .botoes-redes-container { display: flex; flex-direction: column; gap: 16px; padding: 0 25px; }
+
+        .btn-rede-social { width: 100%; background-color: #161426; border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; text-decoration: none; color: #FFFFFF; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .icone-rede-box { width: 40px; font-size: 24px; color: #5A94CB; }
+        .texto-rede-box { flex: 1; padding-left: 5px; }
+        .seta-rede-box { font-size: 14px; color: #FF4D4D; opacity: 0.7; }
+
+        .menu-inferior { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 450px; background-color: #161426; border-top: 2px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-around; padding: 10px 0; height: 60px; align-items: center; z-index: 1000; }
+        .menu-item { display: flex; flex-direction: column; align-items: center; color: #8884A4; text-decoration: none; font-size: 11px; font-weight: 600; cursor: pointer; }
+        .menu-item i { font-size: 20px; margin-bottom: 2px; }
+        .menu-item.ativo { color: #FFFFFF; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Banner atualizado -->
+        <img src="assets/banner_contatos.jpg" alt="Contatos" class="banner-topo">
+        
+        <h2 class="titulo-contato">Contato e Redes Sociais</h2>
+
+        <div class="botoes-redes-container">
+            <a href="https://wa.me/5511999999999" target="_blank" class="btn-rede-social">
+                <div class="icone-rede-box"><i class="fa-brands fa-whatsapp"></i></div>
+                <div class="texto-rede-box">Falar no WhatsApp</div>
+                <div class="seta-rede-box"><i class="fa-solid fa-chevron-right"></i></div>
+            </a>
+            <a href="https://instagram.com/adrianokaraoke" target="_blank" class="btn-rede-social">
+                <div class="icone-rede-box"><i class="fa-brands fa-instagram"></i></div>
+                <div class="texto-rede-box">Siga no Instagram</div>
+                <div class="seta-rede-box"><i class="fa-solid fa-chevron-right"></i></div>
+            </a>
+            <a href="https://facebook.com/adrianokaraoke" target="_blank" class="btn-rede-social">
+                <div class="icone-rede-box"><i class="fa-brands fa-facebook-f"></i></div>
+                <div class="texto-rede-box">Curta no Facebook</div>
+                <div class="seta-rede-box"><i class="fa-solid fa-chevron-right"></i></div>
+            </a>
+            <a href="tel:11999999999" class="btn-rede-social">
+                <div class="icone-rede-box"><i class="fa-solid fa-phone"></i></div>
+                <div class="texto-rede-box">Ligar para Adriano Karaokê</div>
+                <div class="seta-rede-box"><i class="fa-solid fa-chevron-right"></i></div>
+            </a>
+        </div>
+
+        <nav class="menu-inferior">
+            <a class="menu-item" href="catalogo.html"><i class="fa-solid fa-house"></i>Catálogo</a>
+            <a class="menu-item" href="favoritos.html"><i class="fa-solid fa-heart"></i>Favoritos</a>
+            <a class="menu-item ativo" href="contato.html"><i class="fa-solid fa-comments"></i>Contato</a>
+            <a class="menu-item" href="ferramentas.html"><i class="fa-solid fa-gear"></i>Ferramentas</a>
+        </nav>
+    </div>
+
+    <script>
+        setTimeout(function() {
+            if(localStorage.getItem('tema') === 'modo-claro') {
+                document.body.classList.add('modo-claro');
+            }
+        }, 50); 
+    </script>
+</body>
+</html>

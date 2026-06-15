@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adriano Karaokê - Ferramentas Inteligentes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: #000000; color: #FFFFFF; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; overflow-x: hidden; }
+        
+        .app-container { width: 100%; max-width: 450px; background-color: #000000; display: flex; flex-direction: column; min-height: 100vh; position: relative; padding-bottom: 90px; }
+        
+        /* Estilo do novo banner */
+        .banner-topo { width: 100%; height: auto; display: block; border-bottom: 3px solid #161426; }
+        
+        .header-ferramentas { text-align: center; padding: 20px 20px 15px 20px; }
+        .icon-central-sinc { font-size: 45px; color: #00E5FF; margin-bottom: 12px; }
+        .titulo-tela { font-size: 22px; font-weight: 700; color: #FFFFFF; }
+        .sub-titulo-secao { font-size: 14px; color: #8884A4; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px; margin-bottom: 5px; }
+        .conteudo-principal { padding: 0 25px; display: flex; flex-direction: column; gap: 16px; }
+        .card-status { background-color: #12111A; border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+        .linha-status { display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+        .label-status { color: #E2E0EC; font-weight: 500; }
+        .valor-status { color: #FFFFFF; font-weight: 600; }
+        .container-progresso { margin-top: 5px; display: flex; flex-direction: column; gap: 6px; }
+        .barra-fundo { width: 100%; height: 6px; background-color: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden; }
+        .barra-preenchimento { width: 0%; height: 100%; background: linear-gradient(90deg, #A08CD2, #00E5FF); border-radius: 4px; transition: width 0.4s ease; }
+        .texto-progresso { font-size: 12px; color: #00E5FF; text-align: left; font-weight: 500; }
+        .container-botoes-acao { display: flex; flex-direction: column; gap: 12px; }
+        .btn-ferramenta { width: 100%; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; border: none; transition: transform 0.1s; }
+        .btn-ferramenta:active { transform: scale(0.98); }
+        .btn-sincronizar { background-color: #00E5FF; color: #000000; }
+        .btn-limpar-favoritos { background-color: transparent; color: #FF4D4D; border: 1px solid #FF4D4D; }
+        .btn-chamar-admin { background-color: #161426; color: #8884A4; border: 1px solid rgba(255, 255, 255, 0.05); margin-top: 15px; font-size: 13px; }
+        .modal-senha-container { display: none; flex-direction: column; background-color: #12111A; border: 1px solid rgba(255, 77, 77, 0.2); border-radius: 12px; padding: 20px; text-align: center; gap: 15px; margin-top: 10px; }
+        .msg-alerta-vermelha { color: #FF4D4D; font-weight: 700; font-size: 14px; text-transform: uppercase; }
+        .input-senha { width: 100%; background: #000; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 12px; border-radius: 8px; text-align: center; font-size: 15px; outline: none; }
+        .btn-confirmar-senha { background-color: #FF4D4D; color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+        .botoes-admin-secreto { display: none; flex-direction: column; gap: 12px; background-color: #12111A; border: 1px solid rgba(0, 229, 255, 0.2); padding: 15px; border-radius: 12px; margin-top: 10px; }
+        .btn-ver-fila { background-color: #161426; color: #00E5FF; border: 1px solid rgba(0, 229, 255, 0.3); }
+        .btn-restaurar { background-color: #242235; color: #FFFFFF; }
+        
+        .menu-inferior { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 450px; background-color: #12111A; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-around; padding: 10px 0; z-index: 999; }
+        .menu-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #8884A4; text-decoration: none; font-size: 11px; font-weight: 500; cursor: pointer; width: 25%; }
+        .menu-item.ativo { color: #00E5FF; }
+        .menu-item i { font-size: 20px; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Banner novo adicionado -->
+        <img src="assets/banner_ferramentas.jpg" alt="Ferramentas" class="banner-topo">
+        
+        <div class="header-ferramentas">
+            <h1 class="titulo-tela">Ferramentas</h1>
+        </div>
+        <div class="conteudo-principal">
+            <div class="sub-titulo-secao">Configurações do Usuário</div>
+            <div class="card-status">
+                <div class="linha-status">
+                    <span class="label-status">Músicas em Cache Offline:</span>
+                    <span class="valor-status" style="color: #FF4D4D;" id="valor-registros">0 registros</span>
+                </div>
+                <div class="container-progresso">
+                    <div class="barra-fundo"><div class="barra-preenchimento" id="progresso-linha"></div></div>
+                    <div class="texto-progresso" id="txt-progresso-status">Catálogo vazio. Sincronize para começar.</div>
+                </div>
+            </div>
+            <div class="container-botoes-acao">
+                <button class="btn-ferramenta btn-sincronizar" onclick="simularSincronizacaoOffline()">
+                    <i class="fa-solid fa-cloud-arrow-down"></i> Sincronizar Meu Catálogo
+                </button>
+                <button class="btn-ferramenta btn-limpar-favoritos" onclick="simularLimpezaLocalStorage()">
+                    <i class="fa-solid fa-trash-can"></i> Limpar Meus Favoritos (Deste Celular)
+                </button>
+            </div>
+            <button class="btn-ferramenta btn-chamar-admin" id="btn-chamar-painel" onclick="mostrarCaixaSenha()">
+                <i class="fa-solid fa-lock"></i> Acessar Painel do Administrador
+            </button>
+            <div class="modal-senha-container" id="caixa-senha-admin">
+                <div class="msg-alerta-vermelha"><i class="fa-solid fa-triangle-exclamation"></i> Área Restrita!</div>
+                <p style="font-size: 12px; color: #8884A4;">Digite a senha master para liberar os controles da festa.</p>
+                <input type="text" id="campo-senha" class="input-senha" placeholder="Digite a senha do admin...">
+                <button class="btn-confirmar-senha" onclick="verificarSenhaMaster()">Liberar Controle</button>
+            </div>
+            <div class="botoes-admin-secreto" id="funcoes-dono">
+                <div class="sub-titulo-secao" style="color: #00E5FF; margin-top: 0;">Controles do Evento</div>
+                <button class="btn-ferramenta btn-ver-fila" onclick="alert('Abrindo gerenciador de fila...')">
+                    <i class="fa-solid fa-list-ol"></i> Gerenciar Fila de Espera (Festa)
+                </button>
+                <button class="btn-ferramenta btn-restaurar" onclick="alert('Backup geral restaurado!')">
+                    <i class="fa-solid fa-database"></i> Restaurar Backup Master
+                </button>
+            </div>
+        </div>
+        
+        <nav class="menu-inferior">
+            <a class="menu-item" href="catalogo.html"><i class="fa-solid fa-house"></i>Catálogo</a>
+            <a class="menu-item" href="favoritos.html"><i class="fa-solid fa-heart"></i>Favoritos</a>
+            <a class="menu-item" href="contato.html"><i class="fa-solid fa-comments"></i>Contato</a>
+            <a class="menu-item ativo" href="ferramentas.html"><i class="fa-solid fa-gear"></i>Ferramentas</a>
+        </nav>
+    </div>
+    <script>
+        function simularSincronizacaoOffline() {
+            const txtStatus = document.getElementById('txt-progresso-status');
+            const barra = document.getElementById('progresso-linha');
+            const valorRegistros = document.getElementById('valor-registros');
+            barra.style.width = "10%";
+            txtStatus.innerText = "Iniciando download do catálogo...";
+            valorRegistros.innerText = "Sincronizando...";
+            valorRegistros.style.color = "#00E5FF";
+            setTimeout(() => {
+                barra.style.width = "60%";
+                txtStatus.innerText = "Processando novos registros...";
+                setTimeout(() => {
+                    barra.style.width = "100%";
+                    txtStatus.innerText = "Pronto! Catálogo 100% atualizado!";
+                    valorRegistros.innerText = "14.820 registros";
+                    valorRegistros.style.color = "#FFFFFF";
+                    alert("Sucesso!\n\nCatálogo carregado do zero.");
+                }, 1200);
+            }, 1200);
+        }
+        function simularLimpezaLocalStorage() {
+            if(confirm("Deseja apagar os favoritos salvos NESTE celular?")) { alert("Favoritos deste aparelho limpos com sucesso!"); }
+        }
+        function mostrarCaixaSenha() {
+            document.getElementById('caixa-senha-admin').style.display = 'flex';
+            document.getElementById('btn-chamar-painel').style.display = 'none';
+        }
+        function verificarSenhaMaster() {
+            let senha = document.getElementById('campo-senha').value;
+            if(senha === "aca301171") {
+                alert("Acesso Concedido, Adriano! Controles de administrador liberados com sucesso.");
+                document.getElementById('caixa-senha-admin').style.display = 'none';
+                document.getElementById('funcoes-dono').style.display = 'flex';
+            } else {
+                alert("❌ ACESSO NEGADO!\n\nSe você esqueceu a senha, lembre-se:\n\nA dica são as minhas iniciais do nome em letras minúsculas e a data do meu aniversário 301171 tudo junto e sem espaços.");
+                document.getElementById('campo-senha').value = "";
+            }
+        }
+    </script>
+</body>
+</html>

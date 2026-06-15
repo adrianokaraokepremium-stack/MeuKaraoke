@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adriano Karaokê - Tela de Abertura</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: #0B0A12; color: #FFFFFF; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; position: relative; }
+        .app-container { width: 100%; max-width: 450px; height: 100vh; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 40px 20px; position: relative; }
+        
+        .btn-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: #FFFFFF; font-size: 24px; font-weight: bold; cursor: pointer; transition: transform 0.2s ease; opacity: 0.6; }
+        .btn-close:hover { transform: scale(1.2); opacity: 1; }
+
+        .center-content { display: flex; flex-direction: column; align-items: center; margin-top: auto; margin-bottom: auto; }
+        .logo-wrapper { width: 260px; height: 260px; border-radius: 50%; padding: 5px; background: linear-gradient(145deg, #FF2E93, #00F5D4); box-shadow: 0 0 35px rgba(255, 46, 147, 0.4); margin-bottom: 20px; }
+        .logo-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .version-text { font-size: 14px; color: #8884A4; letter-spacing: 1px; font-weight: 500; }
+
+        .bottom-content { width: 100%; max-width: 160px; display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 30px; }
+        .loading-status { font-size: 13px; text-transform: uppercase; letter-spacing: 2px; color: #FFFFFF; font-weight: 600; text-align: center; white-space: nowrap; }
+        .retro-loader-container { width: 100%; height: 26px; border: 2px solid #FFFFFF; padding: 2px; background-color: #161426; display: flex; gap: 2px; }
+        .loader-block { height: 100%; flex: 1; background-color: #FFFFFF; box-shadow: 0 0 6px rgba(255, 255, 255, 0.3); opacity: 0; transition: opacity 0.1s ease; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Botão agora fecha diretamente -->
+        <button class="btn-close" onclick="window.close()">×</button>
+
+        <div class="center-content">
+            <div class="logo-wrapper">
+                <img src="assets/logo-circulo.png" alt="Adriano Karaokê" class="logo-img">
+            </div>
+            <div class="version-text">Versão: 2.02</div>
+        </div>
+
+        <div class="bottom-content">
+            <div class="loading-status" id="status-text">CARREGANDO... 0%</div>
+            <div class="retro-loader-container">
+                <div class="loader-block"></div><div class="loader-block"></div><div class="loader-block"></div>
+                <div class="loader-block"></div><div class="loader-block"></div><div class="loader-block"></div>
+                <div class="loader-block"></div><div class="loader-block"></div><div class="loader-block"></div>
+                <div class="loader-block"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const blocks = document.querySelectorAll('.loader-block');
+        const statusText = document.getElementById('status-text');
+
+        function atualizarBarra(progresso) {
+            let numBlocks = Math.floor(progresso / 10);
+            blocks.forEach((block, index) => {
+                block.style.opacity = (index < numBlocks) ? '1' : '0';
+            });
+            statusText.innerText = progresso >= 100 ? "PRONTO!" : `CARREGANDO... ${progresso}%`;
+        }
+
+        window.onload = () => {
+            let progresso = 0;
+            const intervalo = setInterval(() => {
+                progresso += 10;
+                atualizarBarra(progresso);
+                if (progresso >= 100) {
+                    clearInterval(intervalo);
+                    setTimeout(() => {
+                        window.location.href = "catalogo.html"; // Redireciona para o catálogo
+                    }, 800);
+                }
+            }, 300);
+        };
+    </script>
+</body>
+</html>
