@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adriano Karaokê - Catálogo</title>
+    <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
+        body { background-color: #0B0A12; color: #FFFFFF; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; overflow-x: hidden; padding-bottom: 80px; }
+        body.modo-claro { background-color: #4A32A1 !important; }
+        body.modo-claro .app-container { background-color: #4A32A1 !important; }
+        body.modo-claro .card-contador, body.modo-claro .card-musica, body.modo-claro .input-pesquisa, body.modo-claro .btn-novas { background-color: #FFFFFF !important; border: 1px solid #CCCCCC !important; color: #333333 !important; }
+        body.modo-claro .txt-musica { color: #000000 !important; }
+        body.modo-claro .txt-label { color: #546E7A !important; }
+        body.modo-claro .txt-cantor { color: #007BFF !important; } 
+        body.modo-claro .txt-codigo { color: #D81B60 !important; }
+        body.modo-claro .menu-inferior { background-color: #4A32A1 !important; }
+        body.modo-claro .slider { background-color: #FFFFFF !important; border: 1px solid #333 !important; }
+        body.modo-claro .slider:before { background-color: #4A32A1 !important; }
+        .fa-sun { color: #FFD700; } 
+        .fa-moon { color: #8884A4; } 
+        body.modo-claro .fa-sun { color: #8884A4; }
+        body.modo-claro .fa-moon { color: #FFFFFF; }
+        .app-container { width: 100%; max-width: 450px; background-color: #0B0A12; display: flex; flex-direction: column; }
+        .banner-topo { width: 100%; height: auto; display: block; border-bottom: 3px solid #161426; }
+        .contadores-container { display: flex; gap: 12px; padding: 15px; width: 100%; }
+        .card-contador { flex: 1; background-color: #161426; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255, 255, 255, 0.05); min-height: 48px; cursor: pointer; }
+        .contador-info { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #FFFFFF; }
+        .contador-valor { font-size: 16px; font-weight: bold; color: #FFFFFF; }
+        .filtros-row { display: flex; justify-content: space-between; align-items: center; padding: 0 15px 15px 15px; }
+        .filtro-item { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: bold; color: #8884A4; text-transform: uppercase; }
+        .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #161426; border-radius: 22px; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: #8884A4; border-radius: 50%; }
+        input:checked + .slider { background-color: #FFFFFF; }
+        input:checked + .slider:before { transform: translateX(22px); background-color: #161426; }
+        .btn-novas { background-color: #161426; border: 1px solid #FFFFFF; color: #FFFFFF; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
+        .pesquisa-container { padding: 0 15px 15px 15px; position: relative; }
+        .pesquisa-wrapper { position: relative; display: flex; align-items: center; }
+        .input-pesquisa { width: 100%; background-color: #161426; border: 2px solid transparent; color: #FFFFFF; padding: 12px 45px; border-radius: 25px; font-size: 15px; outline: none; }
+        .lista-musicas { padding: 0 15px; display: flex; flex-direction: column; gap: 12px; }
+        .card-musica { background-color: #161426; border-radius: 14px; padding: 12px; display: flex; align-items: center; justify-content: space-between; border-left: 5px solid #5A94CB; }
+        .avatar-artista { width: 55px; height: 55px; border-radius: 10px; cursor: pointer; }
+        .musica-detalhes { display: flex; flex-direction: column; gap: 2px; }
+        .txt-label { font-size: 13px; color: #8884A4; font-weight: 500; }
+        .txt-musica { font-size: 15px; color: #FFFFFF; font-weight: 700; } 
+        .txt-cantor { font-size: 15px; color: #5A94CB; font-weight: 700; } 
+        .txt-codigo { font-size: 15px; color: #FF4D4D; font-weight: 700; } 
+        .musica-acoes { display: flex; gap: 25px; font-size: 20px; color: #FFFFFF; cursor: pointer; }
+        .menu-inferior { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 450px; background-color: #161426; border-top: 2px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-around; align-items: center; height: 60px; z-index: 1000; }
+        .menu-item { display: flex; flex-direction: column; align-items: center; color: #8884A4; text-decoration: none; font-size: 10px; font-weight: 600; cursor: pointer; }
+        .menu-item i { font-size: 20px !important; margin-bottom: 2px; display: block; }
+        .menu-item.ativo { color: #FFFFFF; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <img src="assets/banner_catalogo.jpg" alt="Catálogo" class="banner-topo">
+        <div class="contadores-container">
+            <div class="card-contador" onclick="window.location.href='favoritos.html'">
+                <div class="contador-info"><i class="fa-solid fa-heart" style="color: #FF4D4D;"></i> Favoritas</div>
+                <div class="contador-valor" id="count-favoritas">0</div>
+            </div>
+            <div class="card-contador" onclick="window.location.href='catalogo.html'">
+                <div class="contador-info"><i class="fa-solid fa-music"></i> Músicas</div>
+                <div class="contador-valor" id="count-total">...</div>
+            </div>
+        </div>
+        <div class="filtros-row">
+            <div class="filtro-item"><i class="fa-solid fa-music"></i><label class="switch"><input type="checkbox" id="check-ordem"><span class="slider"></span></label><i class="fa-solid fa-user"></i></div>
+            <button class="btn-novas" onclick="window.location.href='novas.html'"><i class="fa-solid fa-folder-plus"></i> MÚSICAS NOVAS</button>
+            <div class="filtro-item"><i class="fa-solid fa-sun"></i><label class="switch"><input type="checkbox" id="tema-check"><span class="slider"></span></label><i class="fa-solid fa-moon"></i></div>
+        </div>
+        <div class="pesquisa-container">
+            <div class="pesquisa-wrapper">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 30px; color: #8884A4;"></i>
+                <input type="text" id="input-pesquisa" class="input-pesquisa" placeholder="Pesquisar por Cantor, Músicas e Código">
+                <i class="fa-solid fa-microphone" onclick="iniciarBuscaVoz()" style="position: absolute; right: 30px; cursor: pointer;"></i>
+            </div>
+        </div>
+        <div class="lista-musicas" id="container-musicas"></div>
+        <nav class="menu-inferior">
+            <a class="menu-item ativo" href="catalogo.html"><i class="fa-solid fa-house"></i>Catálogo</a>
+            <a class="menu-item" href="favoritos.html"><i class="fa-solid fa-heart"></i>Favoritos</a>
+            <a class="menu-item" href="contato.html"><i class="fa-solid fa-comments"></i>Contato</a>
+            <a class="menu-item" href="ferramentas.html"><i class="fa-solid fa-gear"></i>Ferramentas</a>
+        </nav>
+    </div>
+
+    <script>
+        const db = new Dexie('KaraokeDB');
+        db.version(1).stores({ musicas: '++id,musica,artista,codigo' });
+        
+        let todasAsMusicas = [];
+        let totalFavoritos = 0;
+
+        async function carregarDados() {
+            try {
+                // Carrega o arquivo JSON do seu repositório
+                const resp = await fetch('catalogo_final_pronto.json');
+                todasAsMusicas = await resp.json();
+                await db.musicas.clear();
+                await db.musicas.bulkPut(todasAsMusicas);
+                renderizarLista(todasAsMusicas);
+            } catch (e) {
+                todasAsMusicas = await db.musicas.toArray();
+                renderizarLista(todasAsMusicas);
+            }
+        }
+
+        function renderizarLista(lista) {
+            const container = document.getElementById('container-musicas');
+            const fragment = document.createDocumentFragment();
+            container.innerHTML = '';
+            document.getElementById('count-total').innerText = lista.length;
+            const isOrdemArtista = document.getElementById('check-ordem').checked;
+
+            lista.forEach(m => {
+                const card = document.createElement('div');
+                card.className = 'card-musica';
+                // Usando o campo "foto" diretamente na pasta assets/cantores_webp
+                card.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                        <img src="assets/cantores_webp/${m.foto}" class="avatar-artista" 
+                             onerror="this.src='assets/sem_foto.webp'" 
+                             onclick="abrirMidia('${m.musica}', '${m.artista}', '${m.codigo}')">
+                        <div class="musica-detalhes">
+                            <div><span class="txt-label">${isOrdemArtista ? 'Artista:' : 'Música:'}</span> <span class="${isOrdemArtista ? 'txt-cantor' : 'txt-musica'}">${isOrdemArtista ? m.artista : m.musica}</span></div>
+                            <div><span class="txt-label">${isOrdemArtista ? 'Música:' : 'Artista:'}</span> <span class="${isOrdemArtista ? 'txt-musica' : 'txt-cantor'}">${isOrdemArtista ? m.musica : m.artista}</span></div>
+                            <div><span class="txt-label">Código:</span> <span class="txt-codigo">${String(m.codigo || 0)}</span></div>
+                        </div>
+                    </div>
+                    <div class="musica-acoes">
+                        <i class="fa-solid fa-share-nodes" onclick="compartilharMusica('${m.musica}', '${m.codigo}')"></i>
+                        <i class="fa-regular fa-heart" onclick="toggleFavorito(this)"></i>
+                    </div>`;
+                fragment.appendChild(card);
+            });
+            container.appendChild(fragment);
+        }
+
+        document.getElementById('input-pesquisa').addEventListener('input', (e) => {
+            const t = e.target.value.toLowerCase();
+            renderizarLista(todasAsMusicas.filter(m => (m.musica||"").toLowerCase().includes(t) || (m.artista||"").toLowerCase().includes(t) || String(m.codigo).includes(t)));
+        });
+        document.getElementById('check-ordem').addEventListener('change', () => renderizarLista(todasAsMusicas));
+        document.getElementById('tema-check').addEventListener('change', () => document.body.classList.toggle('modo-claro'));
+        function toggleFavorito(el) { el.classList.toggle('fa-regular'); el.classList.toggle('fa-solid'); totalFavoritos += el.classList.contains('fa-solid') ? 1 : -1; document.getElementById('count-favoritas').innerText = totalFavoritos; }
+        function compartilharMusica(m, c) { if (navigator.share) navigator.share({ title: 'Adriano Karaokê', text: `${m} - Código: ${c}` }); }
+        function abrirMidia(m, c, cod) { window.location.href = `midia.html?musica=${m}&artista=${c}&codigo=${cod}`; }
+        function iniciarBuscaVoz() { const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)(); rec.lang = 'pt-BR'; rec.onresult = (e) => { document.getElementById('input-pesquisa').value = e.results[0][0].transcript; document.getElementById('input-pesquisa').dispatchEvent(new Event('input')); }; rec.start(); }
+        window.onload = () => { if(localStorage.getItem('tema') === 'modo-claro') { document.body.classList.add('modo-claro'); document.getElementById('tema-check').checked = false; } else { document.getElementById('tema-check').checked = true; } carregarDados(); };
+    </script>
+</body>
+</html>
