@@ -17,13 +17,35 @@
         body.modo-claro .txt-cantor { color: #007BFF !important; } 
         body.modo-claro .txt-codigo { color: #D81B60 !important; }
         body.modo-claro .menu-inferior { background-color: #4A32A1 !important; }
-        body.modo-claro .slider { background-color: #FFFFFF !important; border: 1px solid #333 !important; }
+        
+        body.modo-claro .slider { background-color: #FFFFFF !important; border: 1px solid #CCCCCC !important; }
+        body.modo-claro .contador-info { color: #333333 !important; }
+        body.modo-claro .contador-valor { color: #FF4D4D !important; }
         body.modo-claro .slider:before { background-color: #4A32A1 !important; }
-        .fa-sun { color: #FFD700; } 
-        .fa-moon { color: #8884A4; } 
-        body.modo-claro .fa-sun { color: #8884A4; }
-        body.modo-claro .fa-moon { color: #FFFFFF; }
+        body.modo-claro input:checked + .slider:before { background-color: #4A32A1 !important; }
+        
+        body.modo-claro .pesquisa-wrapper .fa-microphone { color: #333333 !important; }
+        body.modo-claro .filtros-row .fa-sun { color: #FFC107 !important; }
+        body.modo-claro .filtros-row .fa-moon { color: #5A94CB !important; }
+        body.modo-claro .filtros-row .fa-music { color: #FFC107 !important; }
+        body.modo-claro .filtros-row .fa-user { color: #5A94CB !important; }
+        
+        .toast-msg { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #00E5FF; color: #000; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: bold; opacity: 0; transition: opacity 0.5s; z-index: 9999; pointer-events: none; }
+        .toast-msg.show { opacity: 1; }
+
         .app-container { width: 100%; max-width: 450px; background-color: #0B0A12; display: flex; flex-direction: column; }
+        
+        /* === CABEÇALHO FIXO === */
+        .header-fixo {
+            position: sticky;
+            top: 0;
+            background-color: #0B0A12;
+            z-index: 100;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+        }
+        body.modo-claro .header-fixo { background-color: #4A32A1 !important; border-bottom: 2px solid rgba(0, 0, 0, 0.1) !important; }
+
         .banner-topo { width: 100%; height: auto; display: block; border-bottom: 3px solid #161426; }
         .contadores-container { display: flex; gap: 12px; padding: 15px; width: 100%; }
         .card-contador { flex: 1; background-color: #161426; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255, 255, 255, 0.05); min-height: 48px; cursor: pointer; }
@@ -38,18 +60,24 @@
         input:checked + .slider { background-color: #FFFFFF; }
         input:checked + .slider:before { transform: translateX(22px); background-color: #161426; }
         .btn-novas { background-color: #161426; border: 1px solid #FFFFFF; color: #FFFFFF; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
-        .pesquisa-container { padding: 0 15px 15px 15px; position: relative; }
+        .pesquisa-container { padding: 0 15px 0 15px; position: relative; }
         .pesquisa-wrapper { position: relative; display: flex; align-items: center; }
         .input-pesquisa { width: 100%; background-color: #161426; border: 2px solid transparent; color: #FFFFFF; padding: 12px 45px; border-radius: 25px; font-size: 15px; outline: none; }
-        .lista-musicas { padding: 0 15px; display: flex; flex-direction: column; gap: 12px; }
+        
+        .lista-musicas { padding: 15px; display: flex; flex-direction: column; gap: 12px; }
         .card-musica { background-color: #161426; border-radius: 14px; padding: 12px; display: flex; align-items: center; justify-content: space-between; border-left: 5px solid #5A94CB; }
-        .avatar-artista { width: 55px; height: 55px; border-radius: 10px; cursor: pointer; }
-        .musica-detalhes { display: flex; flex-direction: column; gap: 2px; }
+        .avatar-artista { width: 55px; height: 55px; border-radius: 10px; cursor: pointer; object-fit: cover; }
+        
+        .musica-detalhes { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+        .musica-detalhes div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+
         .txt-label { font-size: 13px; color: #8884A4; font-weight: 500; }
         .txt-musica { font-size: 15px; color: #FFFFFF; font-weight: 700; } 
         .txt-cantor { font-size: 15px; color: #5A94CB; font-weight: 700; } 
         .txt-codigo { font-size: 15px; color: #FF4D4D; font-weight: 700; } 
-        .musica-acoes { display: flex; gap: 25px; font-size: 20px; color: #FFFFFF; cursor: pointer; }
+        
+        .musica-acoes { display: flex; gap: 20px; font-size: 20px; color: #FFFFFF; cursor: pointer; flex-shrink: 0; }
+        
         .menu-inferior { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 450px; background-color: #161426; border-top: 2px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-around; align-items: center; height: 60px; z-index: 1000; }
         .menu-item { display: flex; flex-direction: column; align-items: center; color: #8884A4; text-decoration: none; font-size: 10px; font-weight: 600; cursor: pointer; }
         .menu-item i { font-size: 20px !important; margin-bottom: 2px; display: block; }
@@ -58,75 +86,152 @@
 </head>
 <body>
     <div class="app-container">
-        <img src="assets/banner_catalogo.jpg" alt="Catálogo" class="banner-topo">
-        <div class="contadores-container">
-            <div class="card-contador" onclick="window.location.href='favoritos.html'">
-                <div class="contador-info"><i class="fa-solid fa-heart" style="color: #FF4D4D;"></i> Favoritas</div>
-                <div class="contador-valor" id="count-favoritas">0</div>
+        <div class="header-fixo">
+            <img src="https://raw.githubusercontent.com/adrianokaraokepremium-stack/MeuKaraoke/refs/heads/main/assets/imagens/banner_catalogo.jpg" alt="Catálogo" class="banner-topo">
+            
+            <div class="contadores-container">
+                <div class="card-contador" onclick="window.location.href='favoritos.html'">
+                    <div class="contador-info"><i class="fa-solid fa-heart" style="color: #FF4D4D;"></i> Favoritas</div>
+                    <div class="contador-valor" id="count-favoritas">0</div>
+                </div>
+                <div class="card-contador" onclick="window.location.href='catalogo.html'">
+                    <div class="contador-info"><i class="fa-solid fa-music"></i> Total de Músicas</div>
+                    <div class="contador-valor" id="count-total">...</div>
+                </div>
             </div>
-            <div class="card-contador" onclick="window.location.href='catalogo.html'">
-                <div class="contador-info"><i class="fa-solid fa-music"></i> Músicas</div>
-                <div class="contador-valor" id="count-total">...</div>
+            
+            <div class="filtros-row">
+                <div class="filtro-item"><i class="fa-solid fa-music"></i><label class="switch"><input type="checkbox" id="check-ordem"><span class="slider"></span></label><i class="fa-solid fa-user"></i></div>
+                <button class="btn-novas" onclick="window.location.href='novas.html'"><i class="fa-solid fa-folder-plus"></i> MÚSICAS NOVAS</button>
+                <div class="filtro-item"><i class="fa-solid fa-sun"></i><label class="switch"><input type="checkbox" id="tema-check"><span class="slider"></span></label><i class="fa-solid fa-moon"></i></div>
+            </div>
+            
+            <div class="pesquisa-container">
+                <div class="pesquisa-wrapper">
+                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 30px; color: #8884A4;"></i>
+                    <input type="text" id="input-pesquisa" class="input-pesquisa" placeholder="Pesquisar por Cantor, Músicas e Código">
+                    <i class="fa-solid fa-microphone" onclick="iniciarBuscaVoz()" style="position: absolute; right: 30px; cursor: pointer;"></i>
+                </div>
             </div>
         </div>
-        <div class="filtros-row">
-            <div class="filtro-item"><i class="fa-solid fa-music"></i><label class="switch"><input type="checkbox" id="check-ordem"><span class="slider"></span></label><i class="fa-solid fa-user"></i></div>
-            <button class="btn-novas" onclick="window.location.href='novas.html'"><i class="fa-solid fa-folder-plus"></i> MÚSICAS NOVAS</button>
-            <div class="filtro-item"><i class="fa-solid fa-sun"></i><label class="switch"><input type="checkbox" id="tema-check"><span class="slider"></span></label><i class="fa-solid fa-moon"></i></div>
-        </div>
-        <div class="pesquisa-container">
-            <div class="pesquisa-wrapper">
-                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 30px; color: #8884A4;"></i>
-                <input type="text" id="input-pesquisa" class="input-pesquisa" placeholder="Pesquisar por Cantor, Músicas e Código">
-                <i class="fa-solid fa-microphone" onclick="iniciarBuscaVoz()" style="position: absolute; right: 30px; cursor: pointer;"></i>
-            </div>
-        </div>
+        
         <div class="lista-musicas" id="container-musicas"></div>
+        
         <nav class="menu-inferior">
             <a class="menu-item ativo" href="catalogo.html"><i class="fa-solid fa-house"></i>Catálogo</a>
             <a class="menu-item" href="favoritos.html"><i class="fa-solid fa-heart"></i>Favoritos</a>
             <a class="menu-item" href="contato.html"><i class="fa-solid fa-comments"></i>Contato</a>
             <a class="menu-item" href="ferramentas.html"><i class="fa-solid fa-gear"></i>Ferramentas</a>
         </nav>
+
+        <!-- CAIXA DE PEDIDO MODAL -->
+        <div id="modal-pedido" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 3000; justify-content: center; align-items: center;">
+            <div style="background: #161426; width: 85%; max-width: 350px; border-radius: 20px; padding: 25px; text-align: center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                <div style="font-size: 18px; font-weight: bold; color: #00E5FF; margin-bottom: 20px;">Quem vai cantar?</div>
+                <input type="text" id="input-nome-cantor" placeholder="Digite seu nome..." style="width: 100%; background: #000; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 12px; border-radius: 8px; text-align: center; font-size: 15px; outline: none; margin-bottom: 15px;">
+                <button onclick="confirmarPedido()" style="width: 100%; background: #00E5FF; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; margin-bottom: 10px;">Enviar Pedido</button>
+                <button onclick="fecharCaixaPedido()" style="background: transparent; color: #FF4D4D; border: none; font-weight: bold; cursor: pointer; font-size: 14px;">Cancelar</button>
+            </div>
+        </div>
     </div>
 
     <script>
         const db = new Dexie('KaraokeDB');
-        db.version(1).stores({ musicas: '++id,musica,artista,codigo' });
+        db.version(1).stores({ musicas: '++id,musica,artista,codigo,foto' });
         
         let todasAsMusicas = [];
-        let totalFavoritos = 0;
+        let listaAtual = []; 
+        let itensRenderizados = 0;
+        const TAMANHO_LOTE = 30; 
+        let observer; 
+        let pedidoAtual = null;
+
+        // === MAGIA DO IP DINÂMICO (PASSO 3) ===
+        // Ele lê o IP do QR Code da TV e memoriza no celular para sempre!
+        let IP_DO_PC = localStorage.getItem('ip_karaoke') || '';
+        const paramsDaURL = new URLSearchParams(window.location.search);
+        if (paramsDaURL.has('ip')) {
+            IP_DO_PC = `http://${paramsDaURL.get('ip')}:5000`;
+            localStorage.setItem('ip_karaoke', IP_DO_PC);
+        }
+
+        async function mostrarNotificacao(texto) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-msg';
+            toast.innerText = texto;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 500); }, 3000);
+        }
 
         async function carregarDados() {
+            todasAsMusicas = await db.musicas.toArray();
+            
+            const params = new URLSearchParams(window.location.search);
+            const buscaArtista = params.get('busca');
+
+            if (todasAsMusicas.length > 0) {
+                if (buscaArtista) {
+                    document.getElementById('input-pesquisa').value = buscaArtista; 
+                    listaAtual = todasAsMusicas.filter(m => (m.artista||"").toLowerCase().includes(buscaArtista.toLowerCase()));
+                } else {
+                    listaAtual = todasAsMusicas;
+                }
+                renderizarLista(listaAtual, true); 
+            }
+
             try {
-                // Carrega o arquivo JSON do seu repositório
-                const resp = await fetch('catalogo_final_pronto.json');
-                todasAsMusicas = await resp.json();
-                await db.musicas.clear();
-                await db.musicas.bulkPut(todasAsMusicas);
-                renderizarLista(todasAsMusicas);
-            } catch (e) {
-                todasAsMusicas = await db.musicas.toArray();
-                renderizarLista(todasAsMusicas);
+                const resp = await fetch('https://raw.githubusercontent.com/adrianokaraokepremium-stack/MeuKaraoke/refs/heads/main/catalogo_final_pronto.json');
+                const novasMusicas = await resp.json();
+                
+                if (JSON.stringify(novasMusicas) !== JSON.stringify(todasAsMusicas)) {
+                    await db.musicas.clear();
+                    await db.musicas.bulkPut(novasMusicas);
+                    todasAsMusicas = novasMusicas;
+                    
+                    if (buscaArtista) {
+                        listaAtual = todasAsMusicas.filter(m => (m.artista||"").toLowerCase().includes(buscaArtista.toLowerCase()));
+                    } else {
+                        listaAtual = todasAsMusicas;
+                    }
+                    renderizarLista(listaAtual, true);
+                    mostrarNotificacao("Catálogo atualizado!");
+                }
+            } catch (e) { 
+                console.log("Modo offline ativo.");
             }
         }
 
-        function renderizarLista(lista) {
+        function renderizarLista(lista, recomecar = false) {
             const container = document.getElementById('container-musicas');
-            const fragment = document.createDocumentFragment();
-            container.innerHTML = '';
-            document.getElementById('count-total').innerText = lista.length;
-            const isOrdemArtista = document.getElementById('check-ordem').checked;
+            
+            if (recomecar) {
+                container.innerHTML = '';
+                itensRenderizados = 0;
+                listaAtual = lista;
+                document.getElementById('count-total').innerText = lista.length;
+            }
 
-            lista.forEach(m => {
+            const limite = Math.min(itensRenderizados + TAMANHO_LOTE, listaAtual.length);
+            const isOrdemArtista = document.getElementById('check-ordem').checked;
+            
+            const favs = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
+            const fragmento = document.createDocumentFragment();
+
+            for (let i = itensRenderizados; i < limite; i++) {
+                const m = listaAtual[i];
                 const card = document.createElement('div');
                 card.className = 'card-musica';
-                // Usando o campo "foto" diretamente na pasta assets/cantores_webp
+                
+                const urlFoto = m.foto ? `https://raw.githubusercontent.com/adrianokaraokepremium-stack/MeuKaraoke/refs/heads/main/assets/artistas/${m.foto}` : `https://raw.githubusercontent.com/adrianokaraokepremium-stack/MeuKaraoke/refs/heads/main/assets/imagens/sem-foto.webp`;
+                const urlErroFoto = `https://raw.githubusercontent.com/adrianokaraokepremium-stack/MeuKaraoke/refs/heads/main/assets/imagens/sem-foto.webp`;
+
+                const isFav = favs.includes(String(m.codigo));
+                const iconeCoração = isFav ? 'fa-solid' : 'fa-regular';
+
                 card.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                        <img src="assets/cantores_webp/${m.foto}" class="avatar-artista" 
-                             onerror="this.src='assets/sem_foto.webp'" 
-                             onclick="abrirMidia('${m.musica}', '${m.artista}', '${m.codigo}')">
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                        <img src="${urlFoto}" class="avatar-artista" onerror="this.onerror=null; this.src='${urlErroFoto}'" onclick="abrirMidia('${m.musica}', '${m.artista}', '${m.codigo}')">
                         <div class="musica-detalhes">
                             <div><span class="txt-label">${isOrdemArtista ? 'Artista:' : 'Música:'}</span> <span class="${isOrdemArtista ? 'txt-cantor' : 'txt-musica'}">${isOrdemArtista ? m.artista : m.musica}</span></div>
                             <div><span class="txt-label">${isOrdemArtista ? 'Música:' : 'Artista:'}</span> <span class="${isOrdemArtista ? 'txt-musica' : 'txt-cantor'}">${isOrdemArtista ? m.musica : m.artista}</span></div>
@@ -134,25 +239,160 @@
                         </div>
                     </div>
                     <div class="musica-acoes">
-                        <i class="fa-solid fa-share-nodes" onclick="compartilharMusica('${m.musica}', '${m.codigo}')"></i>
-                        <i class="fa-regular fa-heart" onclick="toggleFavorito(this)"></i>
+                        <i class="fa-solid fa-play" style="color: #00E5FF;" onclick="abrirCaixaPedido('${m.musica}', '${m.artista}', '${m.codigo}')"></i>
+                        <i class="fa-solid fa-share-nodes" style="color: #5A94CB;" onclick="compartilharMusica('${m.musica}', '${m.codigo}')"></i>
+                        <i class="${iconeCoração} fa-heart" style="color: #FF4D4D;" onclick="toggleFavorito(this, '${m.codigo}')"></i>
                     </div>`;
-                fragment.appendChild(card);
-            });
-            container.appendChild(fragment);
+                
+                fragmento.appendChild(card);
+            }
+
+            container.appendChild(fragmento);
+            itensRenderizados = limite; 
+
+            observarRolagem();
+        }
+
+        // === LÓGICA DE PEDIDOS E COMUNICAÇÃO ===
+        function abrirCaixaPedido(musica, artista, codigo) {
+            if (!IP_DO_PC) {
+                alert("Você precisa ler o QR Code da tela da TV primeiro para conectar o seu celular!");
+                return;
+            }
+
+            pedidoAtual = { musica, artista, codigo };
+            const nomeSalvo = localStorage.getItem('nomeCantor');
+            
+            if (nomeSalvo) {
+                enviarPedido(nomeSalvo);
+            } else {
+                document.getElementById('modal-pedido').style.display = 'flex';
+                document.getElementById('input-nome-cantor').focus();
+            }
+        }
+
+        function fecharCaixaPedido() {
+            document.getElementById('modal-pedido').style.display = 'none';
+            pedidoAtual = null;
+        }
+
+        function confirmarPedido() {
+            const nome = document.getElementById('input-nome-cantor').value.trim();
+            if (nome === '') {
+                alert('Por favor, digite seu nome para cantar!');
+                return;
+            }
+            localStorage.setItem('nomeCantor', nome);
+            document.getElementById('modal-pedido').style.display = 'none';
+            enviarPedido(nome);
+        }
+
+        async function enviarPedido(nome) {
+            if (!pedidoAtual) return;
+            
+            try {
+                mostrarNotificacao('📡 Enviando pedido para a TV...');
+                
+                const resposta = await fetch(`${IP_DO_PC}/pedir`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nome: nome,
+                        musica: pedidoAtual.musica,
+                        artista: pedidoAtual.artista,
+                        codigo: pedidoAtual.codigo
+                    })
+                });
+
+                if (resposta.ok) {
+                    mostrarNotificacao('🎵 Pedido confirmado na tela!');
+                } else {
+                    mostrarNotificacao('❌ Erro ao registrar pedido.');
+                }
+            } catch (erro) {
+                mostrarNotificacao('❌ TV não encontrada. Leia o QR Code novamente.');
+                console.error(erro);
+            }
+            pedidoAtual = null;
+        }
+
+        function observarRolagem() {
+            if (observer) observer.disconnect();
+            const cards = document.querySelectorAll('.card-musica');
+            if (cards.length === 0 || itensRenderizados >= listaAtual.length) return; 
+
+            const ultimoCard = cards[cards.length - 1];
+            observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    renderizarLista(listaAtual, false); 
+                }
+            }, { rootMargin: "300px" }); 
+            observer.observe(ultimoCard);
+        }
+
+        function toggleFavorito(el, codigo) { 
+            let favs = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
+            codigo = String(codigo);
+
+            el.classList.toggle('fa-regular'); 
+            el.classList.toggle('fa-solid'); 
+            
+            if(el.classList.contains('fa-solid')) {
+                if(!favs.includes(codigo)) favs.push(codigo);
+            } else {
+                favs = favs.filter(c => c !== codigo);
+            }
+            
+            localStorage.setItem('meusFavoritos', JSON.stringify(favs));
+            document.getElementById('count-favoritas').innerText = favs.length; 
         }
 
         document.getElementById('input-pesquisa').addEventListener('input', (e) => {
             const t = e.target.value.toLowerCase();
-            renderizarLista(todasAsMusicas.filter(m => (m.musica||"").toLowerCase().includes(t) || (m.artista||"").toLowerCase().includes(t) || String(m.codigo).includes(t)));
+            const musicasFiltradas = todasAsMusicas.filter(m => (m.musica||"").toLowerCase().includes(t) || (m.artista||"").toLowerCase().includes(t) || String(m.codigo).includes(t));
+            renderizarLista(musicasFiltradas, true); 
         });
-        document.getElementById('check-ordem').addEventListener('change', () => renderizarLista(todasAsMusicas));
-        document.getElementById('tema-check').addEventListener('change', () => document.body.classList.toggle('modo-claro'));
-        function toggleFavorito(el) { el.classList.toggle('fa-regular'); el.classList.toggle('fa-solid'); totalFavoritos += el.classList.contains('fa-solid') ? 1 : -1; document.getElementById('count-favoritas').innerText = totalFavoritos; }
-        function compartilharMusica(m, c) { if (navigator.share) navigator.share({ title: 'Adriano Karaokê', text: `${m} - Código: ${c}` }); }
-        function abrirMidia(m, c, cod) { window.location.href = `midia.html?musica=${m}&artista=${c}&codigo=${cod}`; }
-        function iniciarBuscaVoz() { const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)(); rec.lang = 'pt-BR'; rec.onresult = (e) => { document.getElementById('input-pesquisa').value = e.results[0][0].transcript; document.getElementById('input-pesquisa').dispatchEvent(new Event('input')); }; rec.start(); }
-        window.onload = () => { if(localStorage.getItem('tema') === 'modo-claro') { document.body.classList.add('modo-claro'); document.getElementById('tema-check').checked = false; } else { document.getElementById('tema-check').checked = true; } carregarDados(); };
+
+        document.getElementById('check-ordem').addEventListener('change', () => {
+            renderizarLista(listaAtual, true); 
+        });
+
+        document.getElementById('tema-check').addEventListener('change', () => {
+            document.body.classList.toggle('modo-claro');
+            localStorage.setItem('tema', document.body.classList.contains('modo-claro') ? 'modo-claro' : 'modo-escuro');
+        });
+
+        function compartilharMusica(m, c) { 
+            if (navigator.share) navigator.share({ title: 'Adriano Karaokê', text: `${m} - Código: ${c}` });
+        }
+
+        function abrirMidia(m, c, cod) { 
+            window.location.href = `midia.html?musica=${encodeURIComponent(m)}&artista=${encodeURIComponent(c)}&codigo=${encodeURIComponent(cod)}`;
+        }
+
+        function iniciarBuscaVoz() { 
+            const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            rec.lang = 'pt-BR'; 
+            rec.onresult = (e) => { 
+                document.getElementById('input-pesquisa').value = e.results[0][0].transcript; 
+                document.getElementById('input-pesquisa').dispatchEvent(new Event('input')); 
+            }; 
+            rec.start();
+        }
+
+        window.onload = () => { 
+            if(localStorage.getItem('tema') === 'modo-claro') { 
+                document.body.classList.add('modo-claro');
+                document.getElementById('tema-check').checked = false; 
+            } else { 
+                document.getElementById('tema-check').checked = true; 
+            } 
+            
+            const favs = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
+            document.getElementById('count-favoritas').innerText = favs.length;
+
+            carregarDados(); 
+        };
     </script>
 </body>
 </html>
