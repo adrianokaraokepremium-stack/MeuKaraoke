@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Adriano Karaokê - Favoritos</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
         body { background-color: #0B0A12; color: #FFFFFF; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; overflow-x: hidden; padding-bottom: 90px; }
         
-        /* MODO CLARO */
         body.modo-claro { background-color: #4A32A1 !important; }
         body.modo-claro .app-container { background-color: #4A32A1 !important; }
         body.modo-claro .card-contador, body.modo-claro .card-musica, body.modo-claro .input-pesquisa, body.modo-claro .btn-novas { background-color: #FFFFFF !important; border: 1px solid #CCCCCC !important; color: #333333 !important; }
@@ -18,143 +18,372 @@
         body.modo-claro .txt-cantor { color: #007BFF !important; } 
         body.modo-claro .txt-codigo { color: #D81B60 !important; }
         body.modo-claro .menu-inferior { background-color: #4A32A1 !important; }
-        body.modo-claro .slider { background-color: #FFFFFF !important; border: 1px solid #333 !important; }
-        body.modo-claro .slider:before { background-color: #4A32A1 !important; }
-        body.modo-claro .contador-numero, body.modo-claro .contador-info { color: #333333 !important; }
         
-        .fa-microphone { color: #FFFFFF !important; cursor: pointer; }
-        body.modo-claro .fa-microphone { color: #000000 !important; }
+        body.modo-claro .contador-info { color: #333333 !important; }
+        body.modo-claro .contador-valor { color: #FF4D4D !important; }
 
         .app-container { width: 100%; max-width: 450px; background-color: #0B0A12; display: flex; flex-direction: column; }
-        .banner-topo { width: 100%; height: auto; display: block; border-bottom: 3px solid #161426; }
-        .contadores-container { display: flex; gap: 12px; padding: 15px; width: 100%; }
         
+        /* === CABEÇALHO FIXO === */
+        .header-fixo {
+            position: sticky;
+            top: 0;
+            background-color: #0B0A12;
+            z-index: 100;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+        }
+        body.modo-claro .header-fixo { background-color: #4A32A1 !important; border-bottom: 2px solid rgba(0, 0, 0, 0.1) !important; }
+        
+        /* BANNER CSS (FAVORITOS) */
+        .banner-novo-css {
+            width: 100%; height: 80px; 
+            background: linear-gradient(135deg, #110e22 0%, #1a153a 50%, #0B0A12 100%);
+            border-bottom: 2px solid #FF4D4D;
+            display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .banner-novo-css::before { content: ''; position: absolute; top: -30px; left: -20px; width: 100px; height: 100px; background: rgba(255, 77, 77, 0.2); filter: blur(25px); border-radius: 50%; }
+        .banner-novo-css::after { content: ''; position: absolute; bottom: -30px; right: -20px; width: 120px; height: 120px; background: rgba(216, 27, 96, 0.15); filter: blur(30px); border-radius: 50%; }
+        
+        .banner-conteudo { display: flex; align-items: center; justify-content: center; gap: 20px; z-index: 2; width: 100%; padding: 0 15px; }
+        .banner-icone { font-size: 45px; color: #FF4D4D; filter: drop-shadow(0 0 10px rgba(255, 77, 77, 0.6)); }
+        .banner-textos { display: flex; flex-direction: column; justify-content: center; text-align: left; }
+        .banner-sub { font-size: 11px; color: #8884A4; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; margin-bottom: -2px; }
+        .banner-titulo-texto { font-size: 24px; font-weight: 900; color: #FFFFFF; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 15px rgba(255, 255, 255, 0.3); line-height: 1.1;}
+        .destaque-neon { color: #FF4D4D; text-shadow: 0 0 15px rgba(255, 77, 77, 0.6); }
+
+        .contadores-container { display: flex; gap: 12px; padding: 15px; width: 100%; }
         .card-contador { flex: 1; background-color: #161426; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255, 255, 255, 0.05); min-height: 48px; }
         .contador-info { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #FFFFFF; }
-        .contador-numero { font-size: 16px; font-weight: bold; color: #FFFFFF; }
+        .contador-valor { font-size: 16px; font-weight: bold; color: #FFFFFF; }
 
         .filtros-row { display: flex; justify-content: center; align-items: center; padding: 0 15px 15px 15px; }
         .btn-novas { background-color: #161426; border: 1px solid #FFFFFF; color: #FFFFFF; padding: 8px 20px; border-radius: 20px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        .pesquisa-container { padding: 0 15px 15px 15px; position: relative; }
+        .pesquisa-container { padding: 0 15px 0 15px; position: relative; }
         .pesquisa-wrapper { position: relative; display: flex; align-items: center; }
-        .input-pesquisa { width: 100%; background-color: #161426; border: 2px solid transparent; color: #FFFFFF; padding: 12px 45px; border-radius: 25px; font-size: 15px; outline: none; }
+        .input-pesquisa { width: 100%; background-color: #161426; border: 2px solid transparent; color: #FFFFFF; padding: 12px 20px 12px 45px; border-radius: 25px; font-size: 15px; outline: none; }
         
-        .lista-musicas { padding: 0 15px; display: flex; flex-direction: column; gap: 12px; }
+        .lista-musicas { padding: 15px; display: flex; flex-direction: column; gap: 12px; }
         .card-musica { background-color: #161426; border-radius: 14px; padding: 12px; display: flex; align-items: center; justify-content: space-between; border-left: 5px solid #5A94CB; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); }
-        .avatar-artista { width: 55px; height: 55px; border-radius: 10px; cursor: pointer; }
+        .avatar-artista { width: 55px; height: 55px; border-radius: 10px; cursor: pointer; object-fit: cover; }
+        
+        .musica-detalhes { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+        .musica-detalhes div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+
         .txt-label { font-size: 13px; color: #8884A4; font-weight: 500; }
         .txt-musica { font-size: 15px; color: #FFFFFF; font-weight: 700; } 
         .txt-cantor { font-size: 15px; color: #5A94CB; font-weight: 700; } 
         .txt-codigo { font-size: 15px; color: #FF4D4D; font-weight: 700; } 
         
-        /* CORREÇÃO DO CLIQUE */
-        .musica-acoes { display: flex; gap: 30px; font-size: 22px; color: #FFFFFF; cursor: pointer; position: relative; z-index: 10; padding: 10px; }
-        .icone-share, .icone-heart { cursor: pointer; pointer-events: auto; }
-        .icone-share { color: #5A94CB; }
+        /* AÇÕES DA MÚSICA */
+        .musica-acoes { display: flex; flex-direction: column; align-items: center; gap: 12px; flex-shrink: 0; margin-left: 10px; }
+        .icone-play { font-size: 26px; color: #00E676; cursor: pointer; } 
+        .acoes-secundarias { display: flex; gap: 20px; font-size: 20px; cursor: pointer; }
+        .icone-share { color: #5A94CB; } 
+        .icone-heart { color: #FF4D4D; }
         
-        /* RODAPÉ E ÍCONES PADRONIZADOS */
-        .menu-inferior { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 450px; background-color: #161426; border-top: 2px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
-        .menu-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8884A4; text-decoration: none; font-size: 11px; font-weight: 600; cursor: pointer; flex: 1; }
-        .menu-item i { font-size: 20px !important; margin-bottom: 4px; display: block; }
+        .menu-inferior { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 450px; background-color: #161426; border-top: 2px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-around; align-items: center; height: 60px; z-index: 1000; }
+        .menu-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8884A4; text-decoration: none; font-size: 10px; font-weight: 600; cursor: pointer; flex: 1; }
+        .menu-item i { font-size: 20px !important; margin-bottom: 2px; display: block; }
         .menu-item.ativo { color: #FFFFFF; }
+
+        #modal-pedido { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        #modal-pedido.ativo { opacity: 1; pointer-events: auto; }
+        .caixa-modal { background: #161426; border: 2px solid #5A94CB; padding: 25px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; }
+        .input-nome { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #5A94CB; background: #0B0A12; color: #FFF; font-size: 16px; margin: 15px 0; text-align: center; text-transform: uppercase; }
+        .btn-enviar { background: #00E5FF; color: #000; font-weight: bold; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; text-transform: uppercase; }
+        .btn-cancelar { background: transparent; color: #8884A4; border: none; padding: 10px; margin-top: 10px; cursor: pointer; text-decoration: underline; }
+
+        /* MODAL DE ALERTA */
+        .toast-msg { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #00E5FF; color: #000; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: bold; opacity: 0; transition: opacity 0.5s; z-index: 9999; pointer-events: none; }
+        .toast-msg.show { opacity: 1; }
+        
+        #modal-alerta { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 4000; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
+        .caixa-alerta { background: #161426; width: 85%; max-width: 320px; border-radius: 20px; padding: 25px; text-align: center; border: 1px solid rgba(0, 229, 255, 0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- Banner ajustado com o nome correto -->
-        <img src="assets/banner_favoritos.jpg" alt="Favoritos" class="banner-topo">
-
-        <div class="contadores-container">
-            <div class="card-contador">
-                <div class="contador-info"><i class="fa-solid fa-heart" style="color: #FF4D4D;"></i> Favoritas</div>
-                <div class="contador-numero" id="num-favoritas">0</div>
-            </div>
-            <div class="card-contador">
-                <div class="contador-info"><i class="fa-solid fa-music"></i> Total de Músicas</div>
-                <div class="contador-numero" id="num-total">1250</div>
-            </div>
-        </div>
-
-        <div class="filtros-row">
-            <button class="btn-novas" onclick="window.location.href='novas.html'">
-                <i class="fa-solid fa-folder-plus"></i> MÚSICAS NOVAS
-            </button>
-        </div>
-
-        <div class="pesquisa-container">
-            <div class="pesquisa-wrapper">
-                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 15px; color: #8884A4;"></i>
-                <input type="text" id="campo-busca" class="input-pesquisa" placeholder="Pesquisar favoritos..." onkeyup="filtrarFavoritos()">
-                <i class="fa-solid fa-microphone" onclick="iniciarBuscaVoz()" style="position: absolute; right: 15px; cursor: pointer;"></i>
-            </div>
-        </div>
-
-        <div class="lista-musicas" id="lista-container">
-            <div class="card-musica">
-                <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                    <img src="assets/cantores/1kilo.jpg" class="avatar-artista" onclick="abrirMidia('Deixe Me Ir', '1 Kilo', '35045')">
-                    <div class="musica-detalhes">
-                        <div><span class="txt-label">Música:</span> <span class="txt-musica">Deixe Me Ir</span></div>
-                        <div><span class="txt-label">Artista:</span> <span class="txt-cantor">1 Kilo</span></div>
-                        <div><span class="txt-label">Código:</span> <span class="txt-codigo">35045</span></div>
+        <div class="header-fixo">
+            <div class="banner-novo-css">
+                <div class="banner-conteudo">
+                    <i class="fa-solid fa-heart banner-icone"></i>
+                    <div class="banner-textos">
+                        <span class="banner-sub">Adriano Karaokê</span>
+                        <span class="banner-titulo-texto">Suas <span class="destaque-neon">Favoritas</span></span>
                     </div>
                 </div>
-                <div class="musica-acoes">
-                    <i class="fa-solid fa-share-nodes icone-share" onclick="compartilharMusica('Deixe Me Ir', '35045')"></i>
-                    <i class="fa-solid fa-heart" style="color: #FF4D4D;" onclick="removerDosFavoritos(this)"></i>
+            </div>
+
+            <div class="contadores-container">
+                <div class="card-contador">
+                    <div class="contador-info"><i class="fa-solid fa-heart" style="color: #FF4D4D;"></i> Favoritas</div>
+                    <div class="contador-valor" id="num-favoritas">0</div>
+                </div>
+                <div class="card-contador" onclick="navegarComIP('catalogo.html')" style="cursor: pointer;">
+                    <div class="contador-info"><i class="fa-solid fa-music"></i> Total Catálogo</div>
+                    <div class="contador-valor" id="num-total">...</div>
+                </div>
+            </div>
+
+            <div class="filtros-row">
+                <button class="btn-novas" onclick="navegarComIP('novas.html')">
+                    <i class="fa-solid fa-folder-plus"></i> MÚSICAS NOVAS
+                </button>
+            </div>
+
+            <div class="pesquisa-container">
+                <div class="pesquisa-wrapper">
+                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 20px; color: #8884A4;"></i>
+                    <input type="text" id="campo-busca" class="input-pesquisa" placeholder="Pesquisar favoritos..." oninput="filtrarFavoritos()">
                 </div>
             </div>
         </div>
 
+        <div class="lista-musicas" id="lista-container"></div>
+
         <nav class="menu-inferior">
-            <a class="menu-item" href="catalogo.html"><i class="fa-solid fa-house"></i>Catálogo</a>
-            <a class="menu-item ativo" href="favoritos.html"><i class="fa-solid fa-heart"></i>Favoritos</a>
-            <a class="menu-item" href="contato.html"><i class="fa-solid fa-comments"></i>Contato</a>
-            <a class="menu-item" href="ferramentas.html"><i class="fa-solid fa-gear"></i>Ferramentas</a>
+            <a class="menu-item" onclick="navegarComIP('catalogo.html')"><i class="fa-solid fa-house"></i>Catálogo</a>
+            <a class="menu-item ativo" onclick="navegarComIP('favoritos.html')"><i class="fa-solid fa-heart"></i>Favoritos</a>
+            <a class="menu-item" onclick="navegarComIP('contato.html')"><i class="fa-solid fa-comments"></i>Contato</a>
+            <a class="menu-item" onclick="navegarComIP('ferramentas.html')"><i class="fa-solid fa-gear"></i>Ferramentas</a>
         </nav>
     </div>
 
+    <!-- MODAL DE PEDIDO -->
+    <div id="modal-pedido">
+        <div class="caixa-modal">
+            <h3 style="color: #00E5FF; margin-bottom: 5px;">Cantar Música</h3>
+            <p id="txt-modal-musica" style="font-size: 14px; color: #FFF; margin-bottom: 10px;"></p>
+            <input type="text" id="input-cliente" class="input-nome" placeholder="Digite o seu Nome" maxlength="20">
+            <button class="btn-enviar" onclick="enviarPedidoParaTV()">Enviar Pedido</button>
+            <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- ALERTA CUSTOMIZADO -->
+    <div id="modal-alerta">
+        <div class="caixa-alerta">
+            <div id="alerta-icone" style="font-size: 45px; color: #00E5FF; margin-bottom: 15px;"><i class="fa-solid fa-circle-info"></i></div>
+            <div id="alerta-titulo" style="font-size: 18px; font-weight: bold; color: #FFFFFF; margin-bottom: 10px;">Aviso</div>
+            <div id="alerta-mensagem" style="font-size: 14px; color: #8884A4; margin-bottom: 20px; line-height: 1.4;">Mensagem aqui...</div>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button id="btn-alerta-cancelar" style="display: none; flex: 1; background: transparent; color: #FF4D4D; border: 1px solid #FF4D4D; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">Cancelar</button>
+                <button id="btn-alerta-ok" style="flex: 1; background: #00E5FF; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">OK</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        const db = new Dexie('KaraokeDB');
+        db.version(1).stores({ musicas: '++id,musica,artista,codigo,foto' });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        let ipServidor = urlParams.get('ip');
+
+        function navegarComIP(pagina) {
+            if (ipServidor) {
+                window.location.href = `${pagina}?ip=${ipServidor}`;
+            } else {
+                window.location.href = pagina;
+            }
+        }
+
+        function mostrarAlerta(mensagem, titulo = 'Aviso', tipo = 'info', callback = null) {
+            document.getElementById('alerta-titulo').innerText = titulo;
+            document.getElementById('alerta-mensagem').innerText = mensagem;
+            
+            const btnCancelar = document.getElementById('btn-alerta-cancelar');
+            const btnOk = document.getElementById('btn-alerta-ok');
+            const iconeDiv = document.getElementById('alerta-icone');
+            
+            let icone = '<i class="fa-solid fa-circle-info"></i>';
+            let cor = '#00E5FF';
+            
+            btnCancelar.style.display = 'none';
+
+            if(tipo === 'erro') { 
+                icone = '<i class="fa-solid fa-triangle-exclamation"></i>'; cor = '#FF4D4D'; 
+            } else if(tipo === 'sucesso') { 
+                icone = '<i class="fa-solid fa-circle-check"></i>'; cor = '#00E676'; 
+            } else if(tipo === 'confirmar') {
+                icone = '<i class="fa-solid fa-circle-question"></i>'; cor = '#5A94CB';
+                btnCancelar.style.display = 'block';
+            }
+            
+            iconeDiv.innerHTML = icone;
+            iconeDiv.style.color = cor;
+            btnOk.style.background = cor;
+            document.querySelector('.caixa-alerta').style.borderColor = cor;
+            
+            const modal = document.getElementById('modal-alerta');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.style.opacity = '1', 10);
+            
+            btnOk.onclick = () => { fecharAlerta(); if(callback) callback(true); };
+            btnCancelar.onclick = () => { fecharAlerta(); if(callback) callback(false); };
+        }
+
+        function fecharAlerta() {
+            const modal = document.getElementById('modal-alerta');
+            modal.style.opacity = '0';
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+
+        function mostrarNotificacao(texto) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-msg';
+            toast.innerText = texto;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 500); }, 3000);
+        }
+
+        let codigoAtualParaPedir = "";
+
         window.onload = function() { 
-            if(localStorage.getItem('tema') === 'modo-claro') document.body.classList.add('modo-claro'); 
-            atualizarContador();
+            if(localStorage.getItem('tema') === 'modo-claro') { 
+                document.body.classList.add('modo-claro');
+            }
+            carregarFavoritos();
+            const nomeSalvo = localStorage.getItem('AdrianoKaraokeNomeCliente');
+            if(nomeSalvo) document.getElementById('input-cliente').value = nomeSalvo;
         };
 
+        async function carregarFavoritos() {
+            const container = document.getElementById('lista-container');
+            container.innerHTML = '';
+            
+            let favs = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
+            
+            const todasMusicas = await db.musicas.toArray();
+            document.getElementById('num-total').innerText = todasMusicas.length || '0';
+
+            let favoritasReais = todasMusicas.filter(m => favs.includes(String(m.codigo)));
+
+            if (favoritasReais.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#8884A4; margin-top:20px;">Você ainda não tem músicas favoritas.</p>';
+            } else {
+                const fragmento = document.createDocumentFragment();
+                
+                favoritasReais.forEach(m => {
+                    const card = document.createElement('div');
+                    card.className = 'card-musica';
+                    
+                    const urlFoto = m.foto ? `https://raw.githubusercontent.com/adrianokaraokepremium-stack/MeuKaraoke/refs/heads/main/assets/artistas/${m.foto}` : `https://raw.githubusercontent.com/adrianokaraokepremium-stack/MeuKaraoke/refs/heads/main/assets/imagens/sem-foto.webp`;
+                    const urlErroFoto = `https://raw.githubusercontent.com/adrianokaraokepremium-stack/MeuKaraoke/refs/heads/main/assets/imagens/sem-foto.webp`;
+                    
+                    card.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+                            <img src="${urlFoto}" class="avatar-artista" onerror="this.onerror=null; this.src='${urlErroFoto}'" onclick="abrirMidia('${m.musica}', '${m.artista}', '${m.codigo}')">
+                            <div class="musica-detalhes">
+                                <div><span class="txt-label">Música:</span> <span class="txt-musica">${m.musica}</span></div>
+                                <div><span class="txt-label">Artista:</span> <span class="txt-cantor">${m.artista}</span></div>
+                                <div><span class="txt-label">Código:</span> <span class="txt-codigo">${m.codigo}</span></div>
+                            </div>
+                        </div>
+                        <div class="musica-acoes">
+                            <i class="fa-solid fa-circle-play icone-play" onclick="abrirModalPedido('${m.codigo}', '${m.musica.replace(/'/g, "\\'")}')"></i>
+                            <div class="acoes-secundarias">
+                                <i class="fa-solid fa-share-nodes icone-share" onclick="compartilharMusica('${m.musica.replace(/'/g, "\\'")}', '${m.codigo}')"></i>
+                                <i class="fa-solid fa-heart icone-heart" onclick="removerDosFavoritos(this, '${m.codigo}')"></i>
+                            </div>
+                        </div>`;
+                    fragmento.appendChild(card);
+                });
+
+                container.appendChild(fragmento);
+            }
+            atualizarContador();
+        }
+
+        function abrirModalPedido(codigo, nomeMusica) {
+            if (!ipServidor) {
+                mostrarAlerta("Você precisa ler o QR Code da tela da TV primeiro para conectar o seu celular!", "Atenção", "erro");
+                return;
+            }
+            codigoAtualParaPedir = codigo;
+            document.getElementById('txt-modal-musica').innerText = `Deseja cantar ${nomeMusica}?`;
+            document.getElementById('modal-pedido').classList.add('ativo');
+        }
+
+        function fecharModal() {
+            document.getElementById('modal-pedido').classList.remove('ativo');
+        }
+
+        function enviarPedidoParaTV() {
+            const cliente = document.getElementById('input-cliente').value.trim();
+            if (!cliente) { mostrarAlerta("Por favor, digite o seu nome para cantar!", "Atenção", "erro"); return; }
+
+            localStorage.setItem('AdrianoKaraokeNomeCliente', cliente);
+
+            fetch(`http://${ipServidor}:5000/receber_pedido`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ codigo: codigoAtualParaPedir, cliente: cliente })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "ok") {
+                    mostrarNotificacao('🎵 Pedido confirmado na tela!');
+                    fecharModal();
+                } else {
+                    mostrarAlerta("Erro ao enviar pedido para a TV.", "Erro", "erro");
+                }
+            })
+            .catch(error => {
+                mostrarAlerta("Falha de conexão com a TV. Verifique se está na mesma rede Wi-Fi.", "Erro de Conexão", "erro");
+            });
+        }
+
         function atualizarContador() {
-            const cards = document.querySelectorAll('.card-musica');
-            let visiveis = 0;
-            cards.forEach(card => { if (card.style.display !== 'none') visiveis++; });
-            document.getElementById('num-favoritas').innerText = visiveis;
+            let favs = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
+            document.getElementById('num-favoritas').innerText = favs.length;
         }
 
         function compartilharMusica(musica, codigo) { 
-            if (navigator.share) navigator.share({ title: 'Adriano Karaokê', text: `Confira a música ${musica} (Código: ${codigo})!`, url: window.location.href }); 
-        }
-
-        function iniciarBuscaVoz() {
-            const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            rec.lang = 'pt-BR';
-            rec.onresult = (e) => { document.getElementById('campo-busca').value = e.results[0][0].transcript; filtrarFavoritos(); };
-            rec.start();
-        }
-
-        function abrirMidia(m, c, cod) { window.location.href = `midia.html?musica=${m}&cantor=${c}&codigo=${cod}`; }
-
-        function removerDosFavoritos(elemento) {
-            if(confirm("Deseja remover esta música dos seus favoritos?")) {
-                let card = elemento.closest('.card-musica');
-                card.style.display = 'none';
-                atualizarContador();
+            const textoParaCopiar = `Vou cantar ${musica} (Cód: ${codigo}) no Adriano Karaokê!`;
+            let textArea = document.createElement("textarea");
+            textArea.value = textoParaCopiar;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                mostrarNotificacao("🎵 Copiado! Cole no seu WhatsApp ou Instagram.");
+            } catch (err) {
+                mostrarAlerta("Não foi possível copiar o texto automaticamente.", "Erro", "erro");
             }
+            textArea.remove();
         }
+
+        function abrirMidia(m, c, cod) { navegarComIP(`midia.html?musica=${encodeURIComponent(m)}&artista=${encodeURIComponent(c)}&codigo=${encodeURIComponent(cod)}`); }
+
+        function removerDosFavoritos(elemento, codigo) {
+            mostrarAlerta("Deseja remover esta música dos seus favoritos?", "Confirmar", "confirmar", (confirmado) => {
+                if (confirmado) {
+                    let favs = JSON.parse(localStorage.getItem('meusFavoritos')) || [];
+                    favs = favs.filter(c => c !== String(codigo));
+                    localStorage.setItem('meusFavoritos', JSON.stringify(favs));
+
+                    let card = elemento.closest('.card-musica');
+                    if (card) card.remove();
+                    atualizarContador();
+                    mostrarNotificacao("Música removida dos favoritos.");
+                }
+            });
+        }
+        
         function filtrarFavoritos() {
             let input = document.getElementById('campo-busca').value.toLowerCase();
             let cards = document.getElementsByClassName('card-musica');
             for (let card of cards) {
                 card.style.display = card.innerText.toLowerCase().includes(input) ? "flex" : "none";
             }
-            atualizarContador();
         }
     </script>
 </body>
