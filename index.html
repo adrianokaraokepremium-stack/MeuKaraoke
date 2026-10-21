@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Adriano Karaokê - Tela de Abertura</title>
+    <!-- Adicionando o script do banco de dados para a tela inicial -->
+    <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background-color: #0B0A12; color: #FFFFFF; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; position: relative; }
@@ -26,18 +28,17 @@
 <body>
 
     <div class="app-container">
-        <!-- Botão agora fecha diretamente -->
         <button class="btn-close" onclick="window.close()">×</button>
 
         <div class="center-content">
             <div class="logo-wrapper">
-                <img src="assets/logo-circulo.png" alt="Adriano Karaokê" class="logo-img">
+                <img src="assets/logo/logo-circulo.webp" alt="Adriano Karaokê" class="logo-img" onerror="this.src='https://raw.githubusercontent.com/adrianokaraokepremium-stack/MeuKaraoke/refs/heads/main/assets/imagens/banner_catalogo.jpg'">
             </div>
             <div class="version-text">Versão: 2.02</div>
         </div>
 
         <div class="bottom-content">
-            <div class="loading-status" id="status-text">CARREGANDO... 0%</div>
+            <div class="loading-status" id="status-text">INICIANDO...</div>
             <div class="retro-loader-container">
                 <div class="loader-block"></div><div class="loader-block"></div><div class="loader-block"></div>
                 <div class="loader-block"></div><div class="loader-block"></div><div class="loader-block"></div>
@@ -51,26 +52,59 @@
         const blocks = document.querySelectorAll('.loader-block');
         const statusText = document.getElementById('status-text');
 
-        function atualizarBarra(progresso) {
+        const db = new Dexie('KaraokeDB');
+        db.version(1).stores({ musicas: '++id,musica,artista,codigo,foto' });
+
+        // Captura o IP ou qualquer parâmetro que a TV enviou no link
+        const urlParams = window.location.search;
+
+        function atualizarBarra(progresso, textoLabel) {
             let numBlocks = Math.floor(progresso / 10);
             blocks.forEach((block, index) => {
                 block.style.opacity = (index < numBlocks) ? '1' : '0';
             });
-            statusText.innerText = progresso >= 100 ? "PRONTO!" : `CARREGANDO... ${progresso}%`;
+            statusText.innerText = textoLabel || `CARREGANDO... ${progresso}%`;
+        }
+
+        async function carregarSistema() {
+            try {
+                const qtdSalvas = await db.musicas.count();
+
+                if (qtdSalvas > 0) {
+                    atualizarBarra(100, "BEM-VINDO DE VOLTA!");
+                    setTimeout(() => {
+                        // Avança para o catálogo levando o IP junto!
+                        window.location.href = "catalogo.html" + urlParams; 
+                    }, 1000); 
+
+                } else {
+                    atualizarBarra(20, "PRIMEIRO ACESSO...");
+                    
+                    const resp = await fetch('https://raw.githubusercontent.com/adrianokaraokepremium-stack/MeuKaraoke/refs/heads/main/catalogo_final_pronto.json');
+                    atualizarBarra(50, "BAIXANDO MÚSICAS...");
+                    
+                    const novasMusicas = await resp.json();
+                    atualizarBarra(80, "SALVANDO NO CELULAR...");
+
+                    await db.musicas.bulkPut(novasMusicas);
+                    
+                    atualizarBarra(100, "TUDO PRONTO!");
+                    setTimeout(() => {
+                        window.location.href = "catalogo.html" + urlParams; 
+                    }, 800);
+                }
+
+            } catch (e) {
+                console.log("Modo offline detectado.");
+                atualizarBarra(100, "MODO OFFLINE ATIVO");
+                setTimeout(() => {
+                    window.location.href = "catalogo.html" + urlParams; 
+                }, 1000);
+            }
         }
 
         window.onload = () => {
-            let progresso = 0;
-            const intervalo = setInterval(() => {
-                progresso += 10;
-                atualizarBarra(progresso);
-                if (progresso >= 100) {
-                    clearInterval(intervalo);
-                    setTimeout(() => {
-                        window.location.href = "catalogo.html"; // Redireciona para o catálogo
-                    }, 800);
-                }
-            }, 300);
+            carregarSistema();
         };
     </script>
 </body>
