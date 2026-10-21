@@ -24,29 +24,33 @@
         body.modo-claro .slider:before { background-color: #4A32A1 !important; }
         body.modo-claro input:checked + .slider:before { background-color: #4A32A1 !important; }
         
-        body.modo-claro .pesquisa-wrapper .fa-microphone { color: #333333 !important; }
         body.modo-claro .filtros-row .fa-sun { color: #FFC107 !important; }
         body.modo-claro .filtros-row .fa-moon { color: #5A94CB !important; }
         body.modo-claro .filtros-row .fa-music { color: #FFC107 !important; }
         body.modo-claro .filtros-row .fa-user { color: #5A94CB !important; }
         
-        .toast-msg { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #00E5FF; color: #000; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: bold; opacity: 0; transition: opacity 0.5s; z-index: 9999; pointer-events: none; }
-        .toast-msg.show { opacity: 1; }
-
         .app-container { width: 100%; max-width: 450px; background-color: #0B0A12; display: flex; flex-direction: column; }
         
-        /* === CABEÇALHO FIXO === */
-        .header-fixo {
-            position: sticky;
-            top: 0;
-            background-color: #0B0A12;
-            z-index: 100;
-            padding-bottom: 10px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
-        }
+        .header-fixo { position: sticky; top: 0; background-color: #0B0A12; z-index: 100; padding-bottom: 10px; border-bottom: 2px solid rgba(255, 255, 255, 0.05); }
         body.modo-claro .header-fixo { background-color: #4A32A1 !important; border-bottom: 2px solid rgba(0, 0, 0, 0.1) !important; }
 
-        .banner-topo { width: 100%; height: auto; display: block; border-bottom: 3px solid #161426; }
+        /* BANNER COM ÍCONE PRÓXIMO E TEXTO ALINHADO À ESQUERDA */
+        .banner-novo-css {
+            width: 100%; height: 80px; 
+            background: linear-gradient(135deg, #110e22 0%, #1a153a 50%, #0B0A12 100%);
+            border-bottom: 2px solid #5A94CB;
+            display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .banner-novo-css::before { content: ''; position: absolute; top: -30px; left: -20px; width: 100px; height: 100px; background: rgba(90, 148, 203, 0.2); filter: blur(25px); border-radius: 50%; }
+        .banner-novo-css::after { content: ''; position: absolute; bottom: -30px; right: -20px; width: 120px; height: 120px; background: rgba(0, 229, 255, 0.15); filter: blur(30px); border-radius: 50%; }
+        
+        .banner-conteudo { display: flex; align-items: center; justify-content: center; gap: 15px; z-index: 2; width: 100%; padding: 0 15px; }
+        .banner-icone { font-size: 45px; color: #5A94CB; filter: drop-shadow(0 0 10px rgba(90, 148, 203, 0.6)); }
+        .banner-textos { display: flex; flex-direction: column; justify-content: center; text-align: left; }
+        .banner-sub { font-size: 11px; color: #8884A4; text-transform: uppercase; letter-spacing: 2px; font-weight: 800; margin-bottom: -2px; }
+        .banner-titulo-texto { font-size: 24px; font-weight: 900; color: #FFFFFF; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 15px rgba(255, 255, 255, 0.3); line-height: 1.1;}
+        .destaque-neon { color: #5A94CB; text-shadow: 0 0 15px rgba(90, 148, 203, 0.6); }
+
         .contadores-container { display: flex; gap: 12px; padding: 15px; width: 100%; }
         .card-contador { flex: 1; background-color: #161426; border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255, 255, 255, 0.05); min-height: 48px; cursor: pointer; }
         .contador-info { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #FFFFFF; }
@@ -62,7 +66,9 @@
         .btn-novas { background-color: #161426; border: 1px solid #FFFFFF; color: #FFFFFF; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; text-transform: uppercase; }
         .pesquisa-container { padding: 0 15px 0 15px; position: relative; }
         .pesquisa-wrapper { position: relative; display: flex; align-items: center; }
-        .input-pesquisa { width: 100%; background-color: #161426; border: 2px solid transparent; color: #FFFFFF; padding: 12px 45px; border-radius: 25px; font-size: 15px; outline: none; }
+        
+        /* BARRA DE PESQUISA COM FONTE REDUZIDA PARA CABER TUDO */
+        .input-pesquisa { width: 100%; background-color: #161426; border: 2px solid transparent; color: #FFFFFF; padding: 12px 20px 12px 45px; border-radius: 25px; font-size: 13px; outline: none; }
         
         .lista-musicas { padding: 15px; display: flex; flex-direction: column; gap: 12px; }
         .card-musica { background-color: #161426; border-radius: 14px; padding: 12px; display: flex; align-items: center; justify-content: space-between; border-left: 5px solid #5A94CB; }
@@ -76,18 +82,36 @@
         .txt-cantor { font-size: 15px; color: #5A94CB; font-weight: 700; } 
         .txt-codigo { font-size: 15px; color: #FF4D4D; font-weight: 700; } 
         
-        .musica-acoes { display: flex; gap: 20px; font-size: 20px; color: #FFFFFF; cursor: pointer; flex-shrink: 0; }
+        .musica-acoes { display: flex; flex-direction: column; align-items: center; gap: 12px; flex-shrink: 0; margin-left: 10px; }
+        .icone-play { font-size: 26px; color: #00E676; cursor: pointer; } 
+        .acoes-secundarias { display: flex; gap: 20px; font-size: 20px; cursor: pointer; }
+        .icone-share { color: #5A94CB; } 
+        .icone-heart { color: #FF4D4D; }
         
         .menu-inferior { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 450px; background-color: #161426; border-top: 2px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-around; align-items: center; height: 60px; z-index: 1000; }
-        .menu-item { display: flex; flex-direction: column; align-items: center; color: #8884A4; text-decoration: none; font-size: 10px; font-weight: 600; cursor: pointer; }
+        .menu-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8884A4; text-decoration: none; font-size: 10px; font-weight: 600; cursor: pointer; flex: 1; }
         .menu-item i { font-size: 20px !important; margin-bottom: 2px; display: block; }
         .menu-item.ativo { color: #FFFFFF; }
+
+        /* CAIXA DE ALERTA CUSTOMIZADA */
+        .toast-msg { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #00E5FF; color: #000; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: bold; opacity: 0; transition: opacity 0.5s; z-index: 9999; pointer-events: none; }
+        .toast-msg.show { opacity: 1; }
+        #modal-alerta { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 4000; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
+        .caixa-alerta { background: #161426; width: 85%; max-width: 320px; border-radius: 20px; padding: 25px; text-align: center; border: 1px solid rgba(0, 229, 255, 0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
     <div class="app-container">
         <div class="header-fixo">
-            <img src="https://raw.githubusercontent.com/adrianokaraokepremium-stack/MeuKaraoke/refs/heads/main/assets/imagens/banner_catalogo.jpg" alt="Catálogo" class="banner-topo">
+            <div class="banner-novo-css">
+                <div class="banner-conteudo">
+                    <i class="fa-solid fa-music banner-icone"></i>
+                    <div class="banner-textos">
+                        <span class="banner-sub">Adriano Karaokê</span>
+                        <span class="banner-titulo-texto">Nosso <span class="destaque-neon">Catálogo</span></span>
+                    </div>
+                </div>
+            </div>
             
             <div class="contadores-container">
                 <div class="card-contador" onclick="window.location.href='favoritos.html'">
@@ -109,8 +133,7 @@
             <div class="pesquisa-container">
                 <div class="pesquisa-wrapper">
                     <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 30px; color: #8884A4;"></i>
-                    <input type="text" id="input-pesquisa" class="input-pesquisa" placeholder="Pesquisar por Cantor, Músicas e Código">
-                    <i class="fa-solid fa-microphone" onclick="iniciarBuscaVoz()" style="position: absolute; right: 30px; cursor: pointer;"></i>
+                    <input type="text" id="input-pesquisa" class="input-pesquisa" placeholder="Pesquisar por Artista, Música ou Código">
                 </div>
             </div>
         </div>
@@ -133,6 +156,20 @@
                 <button onclick="fecharCaixaPedido()" style="background: transparent; color: #FF4D4D; border: none; font-weight: bold; cursor: pointer; font-size: 14px;">Cancelar</button>
             </div>
         </div>
+
+        <!-- MODAL DE ALERTA CUSTOMIZADO -->
+        <div id="modal-alerta">
+            <div class="caixa-alerta">
+                <div id="alerta-icone" style="font-size: 45px; color: #00E5FF; margin-bottom: 15px;"><i class="fa-solid fa-circle-info"></i></div>
+                <div id="alerta-titulo" style="font-size: 18px; font-weight: bold; color: #FFFFFF; margin-bottom: 10px;">Aviso</div>
+                <div id="alerta-mensagem" style="font-size: 14px; color: #8884A4; margin-bottom: 20px; line-height: 1.4;">Mensagem aqui...</div>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button id="btn-alerta-cancelar" style="display: none; flex: 1; background: transparent; color: #FF4D4D; border: 1px solid #FF4D4D; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">Cancelar</button>
+                    <button id="btn-alerta-ok" style="flex: 1; background: #00E5FF; color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">OK</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -146,8 +183,6 @@
         let observer; 
         let pedidoAtual = null;
 
-        // === MAGIA DO IP DINÂMICO (PASSO 3) ===
-        // Ele lê o IP do QR Code da TV e memoriza no celular para sempre!
         let IP_DO_PC = localStorage.getItem('ip_karaoke') || '';
         const paramsDaURL = new URLSearchParams(window.location.search);
         if (paramsDaURL.has('ip')) {
@@ -155,7 +190,58 @@
             localStorage.setItem('ip_karaoke', IP_DO_PC);
         }
 
-        async function mostrarNotificacao(texto) {
+        function mostrarAlerta(mensagem, titulo = 'Aviso', tipo = 'info', callback = null) {
+            document.getElementById('alerta-titulo').innerText = titulo;
+            document.getElementById('alerta-mensagem').innerText = mensagem;
+            
+            const btnCancelar = document.getElementById('btn-alerta-cancelar');
+            const btnOk = document.getElementById('btn-alerta-ok');
+            const iconeDiv = document.getElementById('alerta-icone');
+            
+            let icone = '<i class="fa-solid fa-circle-info"></i>';
+            let cor = '#00E5FF';
+            
+            btnCancelar.style.display = 'none';
+
+            if(tipo === 'erro') { 
+                icone = '<i class="fa-solid fa-triangle-exclamation"></i>'; 
+                cor = '#FF4D4D'; 
+            } else if(tipo === 'sucesso') { 
+                icone = '<i class="fa-solid fa-circle-check"></i>'; 
+                cor = '#00E676'; 
+            } else if(tipo === 'confirmar') {
+                icone = '<i class="fa-solid fa-circle-question"></i>';
+                cor = '#5A94CB';
+                btnCancelar.style.display = 'block';
+            }
+            
+            iconeDiv.innerHTML = icone;
+            iconeDiv.style.color = cor;
+            btnOk.style.background = cor;
+            document.querySelector('.caixa-alerta').style.borderColor = cor;
+            
+            const modal = document.getElementById('modal-alerta');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.style.opacity = '1', 10);
+            
+            btnOk.onclick = () => {
+                fecharAlerta();
+                if(callback) callback(true);
+            };
+            
+            btnCancelar.onclick = () => {
+                fecharAlerta();
+                if(callback) callback(false);
+            };
+        }
+
+        function fecharAlerta() {
+            const modal = document.getElementById('modal-alerta');
+            modal.style.opacity = '0';
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+
+        function mostrarNotificacao(texto) {
             const toast = document.createElement('div');
             toast.className = 'toast-msg';
             toast.innerText = texto;
@@ -239,9 +325,11 @@
                         </div>
                     </div>
                     <div class="musica-acoes">
-                        <i class="fa-solid fa-play" style="color: #00E5FF;" onclick="abrirCaixaPedido('${m.musica}', '${m.artista}', '${m.codigo}')"></i>
-                        <i class="fa-solid fa-share-nodes" style="color: #5A94CB;" onclick="compartilharMusica('${m.musica}', '${m.codigo}')"></i>
-                        <i class="${iconeCoração} fa-heart" style="color: #FF4D4D;" onclick="toggleFavorito(this, '${m.codigo}')"></i>
+                        <i class="fa-solid fa-circle-play icone-play" onclick="abrirCaixaPedido('${m.musica.replace(/'/g, "\\'")}', '${m.artista.replace(/'/g, "\\'")}', '${m.codigo}')"></i>
+                        <div class="acoes-secundarias">
+                            <i class="fa-solid fa-share-nodes icone-share" onclick="compartilharMusica('${m.musica.replace(/'/g, "\\'")}', '${m.codigo}')"></i>
+                            <i class="${iconeCoração} fa-heart icone-heart" onclick="toggleFavorito(this, '${m.codigo}')"></i>
+                        </div>
                     </div>`;
                 
                 fragmento.appendChild(card);
@@ -253,10 +341,9 @@
             observarRolagem();
         }
 
-        // === LÓGICA DE PEDIDOS E COMUNICAÇÃO ===
         function abrirCaixaPedido(musica, artista, codigo) {
             if (!IP_DO_PC) {
-                alert("Você precisa ler o QR Code da tela da TV primeiro para conectar o seu celular!");
+                mostrarAlerta("Você precisa ler o QR Code da tela da TV primeiro para conectar o seu celular!", "Atenção", "erro");
                 return;
             }
 
@@ -279,7 +366,7 @@
         function confirmarPedido() {
             const nome = document.getElementById('input-nome-cantor').value.trim();
             if (nome === '') {
-                alert('Por favor, digite seu nome para cantar!');
+                mostrarAlerta('Por favor, digite seu nome para cantar!', 'Atenção', 'erro');
                 return;
             }
             localStorage.setItem('nomeCantor', nome);
@@ -307,10 +394,10 @@
                 if (resposta.ok) {
                     mostrarNotificacao('🎵 Pedido confirmado na tela!');
                 } else {
-                    mostrarNotificacao('❌ Erro ao registrar pedido.');
+                    mostrarAlerta('Falha de conexão com a TV. Verifique se está na mesma rede Wi-Fi.', 'Erro de Conexão', 'erro');
                 }
             } catch (erro) {
-                mostrarNotificacao('❌ TV não encontrada. Leia o QR Code novamente.');
+                mostrarAlerta('TV não encontrada. Leia o QR Code novamente.', 'Erro', 'erro');
                 console.error(erro);
             }
             pedidoAtual = null;
@@ -362,22 +449,27 @@
             localStorage.setItem('tema', document.body.classList.contains('modo-claro') ? 'modo-claro' : 'modo-escuro');
         });
 
-        function compartilharMusica(m, c) { 
-            if (navigator.share) navigator.share({ title: 'Adriano Karaokê', text: `${m} - Código: ${c}` });
+        function compartilharMusica(musica, codigo) { 
+            const textoParaCopiar = `Vou cantar ${musica} (Cód: ${codigo}) no Adriano Karaokê!`;
+            let textArea = document.createElement("textarea");
+            textArea.value = textoParaCopiar;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                mostrarNotificacao("🎵 Copiado! Cole no seu WhatsApp ou Instagram.");
+            } catch (err) {
+                mostrarAlerta("Não foi possível copiar o texto automaticamente.", "Erro", "erro");
+            }
+            textArea.remove();
         }
 
         function abrirMidia(m, c, cod) { 
             window.location.href = `midia.html?musica=${encodeURIComponent(m)}&artista=${encodeURIComponent(c)}&codigo=${encodeURIComponent(cod)}`;
-        }
-
-        function iniciarBuscaVoz() { 
-            const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            rec.lang = 'pt-BR'; 
-            rec.onresult = (e) => { 
-                document.getElementById('input-pesquisa').value = e.results[0][0].transcript; 
-                document.getElementById('input-pesquisa').dispatchEvent(new Event('input')); 
-            }; 
-            rec.start();
         }
 
         window.onload = () => { 
